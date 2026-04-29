@@ -60,23 +60,20 @@
 </style>
 </head>
 <body>
-
 <div id="header">
   <div id="logo">ORVEX<span>SEE THE WORLD FIRST</span></div>
   <div id="live-badge"><div id="live-dot"></div>EN VIVO</div>
   <div id="activity">ACTIVIDAD GLOBAL<b id="act-count">—</b></div>
 </div>
-
 <div id="categories">
-  <button class="cat-btn active" data-cat="general">TODOS</button>
-  <button class="cat-btn" data-cat="business">ECONOMIA</button>
-  <button class="cat-btn" data-cat="technology">TECNOLOGIA</button>
-  <button class="cat-btn" data-cat="health">SALUD</button>
-  <button class="cat-btn" data-cat="science">CIENCIA</button>
-  <button class="cat-btn" data-cat="sports">DEPORTES</button>
-  <button class="cat-btn" data-cat="entertainment">ENTRETENIMIENTO</button>
+  <button class="cat-btn active" data-cat="breaking-news" data-lang="es">TODOS</button>
+  <button class="cat-btn" data-cat="business" data-lang="es">ECONOMIA</button>
+  <button class="cat-btn" data-cat="technology" data-lang="es">TECNOLOGIA</button>
+  <button class="cat-btn" data-cat="health" data-lang="es">SALUD</button>
+  <button class="cat-btn" data-cat="science" data-lang="es">CIENCIA</button>
+  <button class="cat-btn" data-cat="sports" data-lang="es">DEPORTES</button>
+  <button class="cat-btn" data-cat="entertainment" data-lang="es">ENTRETENIMIENTO</button>
 </div>
-
 <div id="main">
   <div id="map">
     <div id="loading-overlay">
@@ -94,9 +91,8 @@
     </div>
   </div>
 </div>
-
 <script>
-const API_KEY = '9f11901189b748799c09bb7d952e9326';
+const GNEWS_KEY = '8c0e5a7cae374b1e85aacfade7f74a13';
 
 const countryCoords = {
   'us':{'name':'Estados Unidos','lat':37.09,'lng':-95.71},
@@ -119,14 +115,17 @@ const countryCoords = {
   'ar':{'name':'Argentina','lat':-38.41,'lng':-63.61},
   'ng':{'name':'Nigeria','lat':9.08,'lng':8.67},
   'eg':{'name':'Egipto','lat':26.82,'lng':30.80},
+  'pe':{'name':'Peru','lat':-9.19,'lng':-75.01},
+  'co':{'name':'Colombia','lat':4.57,'lng':-74.29},
+  'cl':{'name':'Chile','lat':-35.67,'lng':-71.54},
 };
 
 const catColorMap = {
-  general:'#00cfff',business:'#00ff88',technology:'#aa44ff',
+  'breaking-news':'#00cfff',business:'#00ff88',technology:'#aa44ff',
   health:'#ff44aa',science:'#ff8800',sports:'#ffdd00',entertainment:'#ff4444'
 };
 
-let map, markers=[], allArticles=[], activeFilter='general';
+let map, markers=[], allArticles=[], activeFilter='breaking-news';
 
 function initMap(){
   map = L.map('map',{zoomControl:true,attributionControl:false}).setView([20,10],2);
@@ -142,33 +141,34 @@ function timeAgo(dateStr){
   return 'Hace '+Math.floor(hrs/24)+'d';
 }
 
-function getCountryFromUrl(url){
-  try{
-    const host = new URL(url).hostname;
-    for(const [code] of Object.entries(countryCoords)){
-      if(host.includes('.'+code+'.') || host.endsWith('.'+code)) return code;
-    }
-  }catch(e){}
-  return null;
-}
-
 function addJitter(lat,lng){
   return [lat+(Math.random()-0.5)*4, lng+(Math.random()-0.5)*4];
+}
+
+function getRandomCountry(idx){
+  const vals = Object.values(countryCoords);
+  return vals[idx % vals.length];
 }
 
 async function fetchNews(category){
   document.getElementById('loading-overlay').style.display='flex';
   document.getElementById('loading-text').textContent='CARGANDO: '+category.toUpperCase()+'...';
   try{
-    const url='https://newsapi.org/v2/top-headlines?category='+category+'&pageSize=30&apiKey='+API_KEY;
-    const res = await fetch(url);
-    const data = await res.json();
-    if(data.status !== 'ok') throw new Error(data.message);
-    allArticles = (data.articles||[]).filter(a=>a.title && a.title!=='[Removed]');
-    document.getElementById('act-count').textContent = (allArticles.length * 471).toLocaleString();
+    const url='https://gnews.io/api/v4/top-headlines?topic='+category+'&lang=es&max=10&apikey='+GNEWS_KEY;
+    const url2='https://gnews.io/api/v4/top-headlines?topic='+category+'&lang=en&max=10&apikey='+GNEWS_KEY;
+    
+    const [res1, res2] = await Promise.all([fetch(url), fetch(url2)]);
+    const [data1, data2] = await Promise.all([res1.json(), res2.json()]);
+    
+    const articles1 = (data1.articles||[]);
+    const articles2 = (data2.articles||[]);
+    allArticles = [...articles1, ...articles2].filter(a=>a.title);
+    
+    document.getElementById('act-count').textContent = (allArticles.length * 312).toLocaleString();
     renderNewsAndMarkers();
   }catch(e){
     document.getElementById('news-list').innerHTML='<div style="padding:20px;font-size:12px;color:#ff4444;text-align:center">Error: '+e.message+'</div>';
+    console.error(e);
   }
   document.getElementById('loading-overlay').style.display='none';
 }
@@ -178,29 +178,22 @@ function renderNewsAndMarkers(){
   markers=[];
   const list = document.getElementById('news-list');
   list.innerHTML='';
-  const fallbackCountries = Object.values(countryCoords);
-  const articlesWithCoords = allArticles.map((a,i)=>{
-    const cc = getCountryFromUrl(a.url||'');
-    const countryData = cc ? countryCoords[cc] : null;
-    const coords = countryData
-      ? addJitter(countryData.lat,countryData.lng)
-      : addJitter(fallbackCountries[i%fallbackCountries.length].lat,fallbackCountries[i%fallbackCountries.length].lng);
-    const countryName = countryData ? countryData.name : fallbackCountries[i%fallbackCountries.length].name;
-    return {...a,lat:coords[0],lng:coords[1],countryName,idx:i};
-  });
 
-  articlesWithCoords.forEach((a,i)=>{
+  allArticles.forEach((a,i)=>{
+    const country = getRandomCountry(i);
+    const coords = addJitter(country.lat, country.lng);
     const color = catColorMap[activeFilter]||'#00cfff';
+
     const el = document.createElement('div');
     el.className='custom-marker';
     el.style.background=color;
     el.style.borderColor=color+'cc';
-    const m = L.marker([a.lat,a.lng],{
+    const m = L.marker([coords[0],coords[1]],{
       icon:L.divIcon({className:'',html:el.outerHTML,iconSize:[14,14],iconAnchor:[7,7]})
     }).addTo(map);
     m.bindPopup(
       '<div class="popup-title">'+a.title.slice(0,80)+(a.title.length>80?'...':'')+'</div>'+
-      '<div class="popup-meta">'+(a.source&&a.source.name?a.source.name:'—')+' · '+a.countryName+'</div>'+
+      '<div class="popup-meta">'+(a.source&&a.source.name?a.source.name:'—')+' · '+country.name+'</div>'+
       (a.url?'<a href="'+a.url+'" class="popup-link" target="_blank">Leer articulo</a>':'')
     );
     m.on('click',()=>highlightNews(i));
@@ -209,10 +202,19 @@ function renderNewsAndMarkers(){
     const item = document.createElement('div');
     item.className='news-item';
     item.id='news-'+i;
-    item.onclick=()=>focusEvent(i,articlesWithCoords);
+    item.onclick=(()=>{
+      const idx=i;
+      const lat=coords[0];
+      const lng=coords[1];
+      return ()=>{
+        map.setView([lat,lng],5,{animate:true});
+        markers[idx]&&markers[idx].openPopup();
+        highlightNews(idx);
+      };
+    })();
     item.innerHTML=
-      (a.urlToImage?'<img class="news-img" src="'+a.urlToImage+'" onerror="this.style.display=\'none\'" alt=""/>':'')+
-      '<div class="news-time">'+timeAgo(a.publishedAt)+' · '+a.countryName+'</div>'+
+      (a.image?'<img class="news-img" src="'+a.image+'" onerror="this.style.display=\'none\'" alt=""/>':'')+
+      '<div class="news-time">'+timeAgo(a.publishedAt)+' · '+country.name+'</div>'+
       '<div class="news-title">'+a.title.slice(0,100)+(a.title.length>100?'...':'')+'</div>'+
       '<div class="news-source">'+(a.source&&a.source.name?a.source.name:'Fuente desconocida')+'</div>';
     list.appendChild(item);
@@ -223,14 +225,6 @@ function highlightNews(idx){
   document.querySelectorAll('.news-item').forEach(n=>n.classList.remove('active'));
   const el=document.getElementById('news-'+idx);
   if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
-}
-
-function focusEvent(idx,articles){
-  const a=articles[idx];
-  if(!a)return;
-  map.setView([a.lat,a.lng],5,{animate:true});
-  markers[idx]&&markers[idx].openPopup();
-  highlightNews(idx);
 }
 
 document.querySelectorAll('.cat-btn').forEach(btn=>{
@@ -268,7 +262,7 @@ function animateMarkets(){
 window.addEventListener('load',()=>{
   initMap();
   animateMarkets();
-  fetchNews('general');
+  fetchNews('breaking-news');
 });
 </script>
 </body>
