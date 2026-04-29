@@ -2,514 +2,676 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ORVEX — El Mundo en Tiempo Real</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--red:#ff3b3b;--purple:#9b59ff;--green:#00e87a;--blue:#00b4ff;--orange:#ff8c00;--cyan:#00cfff;--yellow:#ffd700}
-body{font-family:-apple-system,'SF Pro Display',sans-serif;background:#000;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#ff2d55;--purple:#bf5af2;--green:#30d158;--blue:#0a84ff;
+  --orange:#ff9f0a;--cyan:#64d2ff;--yellow:#ffd60a;--pink:#ff375f;
+  --bg:#000000;--bg2:#0a0a0f;--border:rgba(255,255,255,0.07);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:'Syne',sans-serif;color:#fff;display:flex;flex-direction:column}
 
-/* HEADER */
-#header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.9);z-index:200;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)}
-#logo-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
-#logo-icon{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:15px}
-#logo-text{font-size:16px;font-weight:700;letter-spacing:2px}
-#logo-sub{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1px;display:block}
-#live-pill{background:rgba(255,59,59,0.12);border:1px solid rgba(255,59,59,0.35);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#ff3b3b;letter-spacing:1px}
-#live-dot{width:6px;height:6px;background:#ff3b3b;border-radius:50%;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.1}}
-#header-right{display:flex;gap:14px;align-items:center}
-#bell-btn,#menu-btn{font-size:20px;cursor:pointer;opacity:0.7;transition:opacity 0.2s;background:none;border:none;color:#fff}
-#bell-btn:hover,#menu-btn:hover{opacity:1}
+/* ═══ HEADER ═══ */
+#header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 18px;background:rgba(0,0,0,0.92);
+  border-bottom:1px solid var(--border);z-index:200;flex-shrink:0;
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+#logo-wrap{display:flex;align-items:center;gap:10px}
+#logo-ring{
+  width:36px;height:36px;border-radius:50%;
+  border:1.5px solid var(--cyan);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;position:relative;
+  box-shadow:0 0 12px rgba(100,210,255,0.3);
+}
+#logo-ring::after{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  border:1px solid rgba(100,210,255,0.15);
+}
+#logo-name{font-size:17px;font-weight:800;letter-spacing:3px;color:#fff}
+#logo-tagline{font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:2px;font-family:'Space Mono',monospace;display:block;margin-top:1px}
+#live-badge{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,45,85,0.1);border:1px solid rgba(255,45,85,0.3);
+  border-radius:30px;padding:5px 13px;
+  font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;
+  font-family:'Space Mono',monospace;
+}
+#live-dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 6px var(--red)}50%{opacity:0.2;box-shadow:none}}
+#hdr-icons{display:flex;gap:4px}
+.hdr-btn{
+  width:36px;height:36px;border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);display:flex;align-items:center;
+  justify-content:center;font-size:16px;cursor:pointer;transition:all 0.2s;
+  color:#fff;
+}
+.hdr-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15)}
 
-/* SLIDE MENU */
-#menu-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:500;display:none;backdrop-filter:blur(4px)}
-#menu-overlay.open{display:block}
-#side-menu{position:fixed;top:0;right:-280px;width:280px;height:100%;background:#0a0a0f;border-left:1px solid rgba(255,255,255,0.08);z-index:501;transition:right 0.3s ease;padding:20px 0;display:flex;flex-direction:column}
-#side-menu.open{right:0}
-#menu-header{padding:10px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:10px}
-#menu-logo{font-size:18px;font-weight:700;letter-spacing:3px;color:var(--cyan)}
-#menu-sub{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px}
-.menu-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:background 0.2s;font-size:14px;color:rgba(255,255,255,0.7)}
-.menu-item:hover{background:rgba(255,255,255,0.05);color:#fff}
-.menu-item-icon{font-size:18px;width:24px;text-align:center}
-.menu-divider{height:1px;background:rgba(255,255,255,0.06);margin:8px 0}
-#menu-close{position:absolute;top:14px;right:14px;font-size:20px;cursor:pointer;opacity:0.5;background:none;border:none;color:#fff}
-#menu-close:hover{opacity:1}
-#menu-version{padding:20px;font-size:10px;color:rgba(255,255,255,0.2);margin-top:auto}
+/* ═══ HERO STRIP ═══ */
+#hero{
+  position:relative;flex-shrink:0;height:100px;overflow:hidden;
+  background:linear-gradient(180deg,#000 0%,#000510 100%);
+}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%}
+#hero-content{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+#hero-left{}
+#hero-t1{font-size:26px;font-weight:800;color:#fff;line-height:1;letter-spacing:-0.5px}
+#hero-t2{
+  font-size:26px;font-weight:800;line-height:1;
+  background:linear-gradient(90deg,var(--cyan) 0%,var(--purple) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+#hero-sub{font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-top:5px;font-family:'Space Mono',monospace}
+#hero-right{text-align:right}
+#act-label{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:2px;font-family:'Space Mono',monospace}
+#act-num{font-size:28px;font-weight:800;color:#fff;display:block;line-height:1.1}
+#act-delta{font-size:9px;color:var(--green);font-family:'Space Mono',monospace;margin-top:2px}
 
-/* HERO */
-#hero{position:relative;flex-shrink:0;background:#000;overflow:hidden;height:130px}
-#hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%}
-#hero-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(0,0,0,0.85) 35%,rgba(0,0,0,0.2) 100%)}
-#hero-text{position:absolute;top:16px;left:16px}
-#hero-title1{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1}
-#hero-title2{font-size:24px;font-weight:800;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
-#hero-sub{font-size:10px;color:rgba(255,255,255,0.4);margin-top:5px;letter-spacing:0.5px}
-#activity-box{position:absolute;top:12px;right:14px;text-align:right}
-#act-label{font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:1px}
-#act-count{font-size:22px;font-weight:800;color:#fff;display:block;line-height:1}
-#act-change{font-size:9px;color:var(--green);display:flex;align-items:center;gap:2px;justify-content:flex-end;margin-top:1px}
+/* ═══ GLOBE SECTION ═══ */
+#globe-section{
+  flex-shrink:0;display:flex;justify-content:center;align-items:center;
+  background:radial-gradient(ellipse at center,#000d1a 0%,#000000 70%);
+  padding:6px 0;height:200px;position:relative;
+}
+#globe-container{
+  position:relative;width:220px;height:188px;
+}
+#globe-svg{width:100%;height:100%;cursor:grab}
+#globe-svg:active{cursor:grabbing}
+#globe-glow{
+  position:absolute;inset:-20px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,120,255,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.country-path{
+  fill:#0a1628;stroke:rgba(0,180,255,0.25);stroke-width:0.4;
+  transition:fill 0.3s;
+}
+.country-path:hover{fill:#0d2040}
+.graticule{fill:none;stroke:rgba(0,180,255,0.06);stroke-width:0.3}
+.globe-outline{fill:none;stroke:rgba(0,180,255,0.15);stroke-width:1}
+.news-dot-outer{opacity:0.3;animation:dotPulse 2s ease-out infinite}
+.news-dot-inner{opacity:0.9}
+@keyframes dotPulse{0%{r:4;opacity:0.5}100%{r:12;opacity:0}}
+.graticule-line{fill:none;stroke:rgba(100,210,255,0.04);stroke-width:0.3}
 
-/* GLOBE MAP - OVAL */
-#globe-section{position:relative;flex-shrink:0;display:flex;justify-content:center;align-items:center;background:#000510;padding:10px 0;height:180px}
-#globe-wrapper{position:relative;width:90%;height:160px;border-radius:50%;overflow:hidden;box-shadow:0 0 40px rgba(0,180,255,0.15),0 0 80px rgba(0,0,0,0.8);border:1px solid rgba(0,180,255,0.1)}
-#map{width:100%;height:100%}
-.leaflet-tile-pane{filter:brightness(0.3) saturate(0.15) hue-rotate(210deg)}
-.leaflet-container{background:#000510}
-.leaflet-control-zoom{display:none}
+/* MODO RADAR BTN */
+#radar-btn{
+  position:absolute;bottom:8px;right:14px;
+  display:flex;align-items:center;gap:5px;
+  font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:2px;
+  font-family:'Space Mono',monospace;cursor:pointer;opacity:0.7;
+  transition:opacity 0.2s;border:none;background:none;
+}
+#radar-btn:hover{opacity:1}
 
-/* CATEGORIES */
-#categories{display:flex;overflow-x:auto;gap:6px;padding:8px 14px;background:#000;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;scrollbar-width:none}
+/* ═══ CATEGORIES ═══ */
+#categories{
+  display:flex;overflow-x:auto;gap:6px;padding:8px 14px;
+  background:#000;border-bottom:1px solid var(--border);
+  flex-shrink:0;scrollbar-width:none;
+}
 #categories::-webkit-scrollbar{display:none}
-.cat-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.45);font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit;flex-shrink:0}
+.cat-btn{
+  display:flex;align-items:center;gap:5px;padding:5px 13px;
+  border-radius:30px;border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.4);
+  font-size:10px;cursor:pointer;white-space:nowrap;
+  transition:all 0.2s;font-family:'Syne',sans-serif;
+  font-weight:600;letter-spacing:0.5px;flex-shrink:0;
+}
 .cat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.cat-btn.active{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.2);color:#fff}
+.cat-btn.active{color:#fff;background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.18)}
 
-/* NEWS */
+/* ═══ NEWS ═══ */
 #news-section{flex:1;overflow:hidden;display:flex;flex-direction:column;background:#000}
-#news-header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;flex-shrink:0}
-#news-header-left{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.8)}
-#news-dot{width:6px;height:6px;background:#ff3b3b;border-radius:50%;animation:blink 1s infinite}
-#ver-todas-btn{font-size:11px;color:var(--cyan);opacity:0.8;cursor:pointer;background:none;border:none;font-family:inherit}
+#news-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 16px;flex-shrink:0;border-bottom:1px solid var(--border);
+}
+#news-hdr-left{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);font-family:'Space Mono',monospace}
+#ndot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:blink 1s infinite}
+#ver-btn{font-size:10px;color:var(--cyan);cursor:pointer;background:none;border:none;font-family:'Space Mono',monospace;opacity:0.7;letter-spacing:1px}
+#ver-btn:hover{opacity:1}
 #news-list{flex:1;overflow-y:auto;scrollbar-width:none}
 #news-list::-webkit-scrollbar{display:none}
-.news-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.15s}
-.news-item:hover,.news-item.active{background:rgba(255,255,255,0.04)}
-.news-thumb{width:60px;height:44px;border-radius:7px;object-fit:cover;flex-shrink:0}
-.news-thumb-icon{width:60px;height:44px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px}
-.news-body{flex:1;min-width:0}
-.news-top{display:flex;align-items:center;gap:5px;margin-bottom:2px}
-.news-source-tag{font-size:9px;color:rgba(255,255,255,0.35)}
-.news-urgent{color:#ff3b3b;font-weight:700;font-size:9px;letter-spacing:1px}
-.news-title{font-size:12px;font-weight:500;color:#dde;line-height:1.35;margin-bottom:2px}
-.news-time{font-size:10px;color:rgba(255,255,255,0.25)}
-.news-country{font-size:9px;color:rgba(255,255,255,0.25);flex-shrink:0;min-width:45px;text-align:right;line-height:1.3}
-.news-arrow{font-size:16px;color:rgba(255,255,255,0.15);flex-shrink:0;margin-left:4px}
 
-/* MARKETS */
-#markets-section{background:#000;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding:8px 14px 10px}
-#markets-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
-#markets-title{font-size:10px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.5)}
-#markets-ver{font-size:10px;color:var(--cyan);opacity:0.7;cursor:pointer}
-#markets-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none}
-#markets-row::-webkit-scrollbar{display:none}
-.market-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:7px 10px;flex-shrink:0;min-width:82px}
-.market-icon{font-size:12px;margin-bottom:1px}
-.market-name{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:0.5px}
-.market-price{font-size:13px;font-weight:700;color:#fff;margin:1px 0}
-.market-change{font-size:9px;font-weight:600}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.15s}
+.ni:hover,.ni.active{background:rgba(255,255,255,0.035)}
+.ni-thumb{width:58px;height:42px;border-radius:8px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,0.06)}
+.ni-icon{width:58px;height:42px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px}
+.ni-body{flex:1;min-width:0}
+.ni-top{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.ni-src{font-size:9px;font-family:'Space Mono',monospace;font-weight:700;letter-spacing:0.5px}
+.ni-urg{font-size:8px;color:var(--red);font-weight:700;letter-spacing:1.5px;font-family:'Space Mono',monospace;background:rgba(255,45,85,0.12);padding:1px 5px;border-radius:3px}
+.ni-title{font-size:12px;font-weight:600;color:#dde;line-height:1.35;margin-bottom:2px}
+.ni-time{font-size:9px;color:rgba(255,255,255,0.22);font-family:'Space Mono',monospace}
+.ni-country{font-size:9px;color:rgba(255,255,255,0.22);flex-shrink:0;text-align:right;line-height:1.4;font-family:'Space Mono',monospace;min-width:42px}
+.ni-arr{font-size:18px;color:rgba(255,255,255,0.12);flex-shrink:0;margin-left:2px}
+
+/* ═══ MARKETS ═══ */
+#mkt-section{background:#000;border-top:1px solid var(--border);flex-shrink:0;padding:8px 14px 10px}
+#mkt-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+#mkt-title{font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.4);font-family:'Space Mono',monospace}
+#mkt-ver{font-size:9px;color:var(--cyan);cursor:pointer;font-family:'Space Mono',monospace;opacity:0.7}
+#mkt-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none}
+#mkt-row::-webkit-scrollbar{display:none}
+.mc{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:8px 11px;flex-shrink:0;min-width:84px}
+.mc-icon{font-size:13px;margin-bottom:2px}
+.mc-name{font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:0.5px;font-family:'Space Mono',monospace}
+.mc-price{font-size:14px;font-weight:800;color:#fff;margin:2px 0;font-family:'Space Mono',monospace}
+.mc-chg{font-size:9px;font-weight:700;font-family:'Space Mono',monospace}
 .up{color:var(--green)}.down{color:var(--red)}
-.spark{height:16px;display:flex;align-items:flex-end;gap:1px;margin-top:3px}
-.spark-bar{width:4px;border-radius:1px}
+.spark{height:14px;display:flex;align-items:flex-end;gap:1px;margin-top:4px}
+.sb{width:4px;border-radius:1px;opacity:0.55}
 
-/* BOTTOM NAV */
-#bottom-nav{display:flex;background:#080808;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding:4px 0 6px}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0;cursor:pointer;opacity:0.35;transition:opacity 0.2s}
-.nav-item.active{opacity:1}
-.nav-icon{font-size:18px;margin-bottom:1px}
-.nav-label{font-size:8px;letter-spacing:0.5px;color:rgba(255,255,255,0.6)}
-#nav-center-wrap{flex:1;display:flex;justify-content:center;align-items:center;padding-bottom:2px}
-#nav-center{width:46px;height:46px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin-top:-10px;box-shadow:0 0 16px rgba(0,180,255,0.35)}
+/* ═══ BOTTOM NAV ═══ */
+#bnav{display:flex;background:#050505;border-top:1px solid var(--border);flex-shrink:0;padding:4px 0 6px}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;padding:5px 0;cursor:pointer;opacity:0.3;transition:opacity 0.2s}
+.bni.active{opacity:1}
+.bni-icon{font-size:18px;margin-bottom:1px}
+.bni-label{font-size:7px;letter-spacing:1px;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace}
+#bnav-center{flex:1;display:flex;justify-content:center;align-items:center}
+#bnav-fab{
+  width:48px;height:48px;margin-top:-14px;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:20px;cursor:pointer;
+  box-shadow:0 0 20px rgba(100,210,255,0.3),0 0 40px rgba(100,210,255,0.1);
+}
+
+/* ═══ SIDE MENU ═══ */
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;backdrop-filter:blur(6px)}
+#overlay.on{display:block}
+#smenu{
+  position:fixed;top:0;right:-290px;width:280px;height:100%;
+  background:#080810;border-left:1px solid var(--border);
+  z-index:501;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);
+  display:flex;flex-direction:column;
+}
+#smenu.on{right:0}
+#smenu-hdr{padding:18px 20px 16px;border-bottom:1px solid var(--border)}
+#smenu-logo{font-size:20px;font-weight:800;letter-spacing:4px;color:var(--cyan)}
+#smenu-tag{font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:2px;font-family:'Space Mono',monospace;margin-top:2px}
+#smenu-x{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;color:rgba(255,255,255,0.5)}
+.smi{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:background 0.15s;font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);letter-spacing:0.5px}
+.smi:hover{background:rgba(255,255,255,0.04);color:#fff}
+.smi-ic{font-size:17px;width:22px;text-align:center}
+.smi-div{height:1px;background:var(--border);margin:6px 0}
+#smenu-ver{padding:16px 20px;font-size:9px;color:rgba(255,255,255,0.15);font-family:'Space Mono',monospace;margin-top:auto}
+
+/* ═══ MODAL ═══ */
+#modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:600;display:none;align-items:flex-end;backdrop-filter:blur(8px)}
+#modal-wrap.on{display:flex}
+#modal{background:#08080f;border-radius:20px 20px 0 0;width:100%;max-height:82vh;display:flex;flex-direction:column;border:1px solid var(--border);border-bottom:none}
+#modal-pill{width:34px;height:3px;background:rgba(255,255,255,0.18);border-radius:2px;margin:10px auto 0}
+#modal-hdr{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+#modal-ttl{font-size:13px;font-weight:700;letter-spacing:2px;font-family:'Space Mono',monospace}
+#modal-x{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.5)}
+#modal-body{overflow-y:auto;flex:1;padding:0}
 
 /* POPUP */
-.leaflet-popup-content-wrapper{background:rgba(4,4,20,0.97);border:1px solid rgba(0,180,255,0.18);border-radius:10px;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.9)}
-.leaflet-popup-tip{background:rgba(4,4,20,0.97)}
-.leaflet-popup-content{margin:10px 13px;font-size:12px;line-height:1.5;min-width:150px}
-.popup-loc{font-size:10px;font-weight:700;color:var(--cyan);margin-bottom:3px;letter-spacing:0.5px}
-.popup-title{font-size:12px;color:#dde;margin-bottom:3px;line-height:1.3}
-.popup-time{font-size:10px;color:rgba(255,255,255,0.3)}
-
-/* VER TODAS MODAL */
-#modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:600;display:none;backdrop-filter:blur(6px);align-items:flex-end}
-#modal-overlay.open{display:flex}
-#modal{background:#0a0a12;border-radius:18px 18px 0 0;width:100%;max-height:80vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.08);border-bottom:none}
-#modal-handle{width:36px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:10px auto 0}
-#modal-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06)}
-#modal-title{font-size:14px;font-weight:600;letter-spacing:1px}
-#modal-close{font-size:20px;cursor:pointer;opacity:0.5;background:none;border:none;color:#fff}
-#modal-list{overflow-y:auto;flex:1;padding:8px 0}
+.leaflet-popup-content-wrapper,.lpop{background:rgba(4,6,22,0.98);border:1px solid rgba(100,210,255,0.15);border-radius:12px;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,0.95)}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div id="header">
   <div id="logo-wrap">
-    <div id="logo-icon">🌐</div>
+    <div id="logo-ring">🌐</div>
     <div>
-      <div id="logo-text">ORVEX</div>
-      <span id="logo-sub">SEE THE WORLD FIRST</span>
+      <div id="logo-name">ORVEX</div>
+      <span id="logo-tagline">SEE THE WORLD FIRST</span>
     </div>
   </div>
-  <div id="live-pill"><div id="live-dot"></div>EN VIVO</div>
-  <div id="header-right">
-    <button id="bell-btn">🔔</button>
-    <button id="menu-btn">☰</button>
+  <div id="live-badge"><div id="live-dot"></div>EN VIVO</div>
+  <div id="hdr-icons">
+    <div class="hdr-btn" id="bell-btn">🔔</div>
+    <div class="hdr-btn" id="menu-btn">☰</div>
   </div>
 </div>
 
-<!-- SIDE MENU -->
-<div id="menu-overlay">
-  <div id="side-menu">
-    <button id="menu-close">✕</button>
-    <div id="menu-header">
-      <div id="menu-logo">ORVEX</div>
-      <div id="menu-sub">SEE THE WORLD FIRST</div>
-    </div>
-    <div class="menu-item" onclick="closeMenu()">🌍 <span>Mapa Mundial</span></div>
-    <div class="menu-item">📈 <span>Tendencias</span></div>
-    <div class="menu-item">🔔 <span>Alertas</span></div>
-    <div class="menu-item">🔖 <span>Guardados</span></div>
-    <div class="menu-divider"></div>
-    <div class="menu-item">⚙️ <span>Configuración</span></div>
-    <div class="menu-item">🌙 <span>Modo Oscuro</span></div>
-    <div class="menu-item">📤 <span>Compartir App</span></div>
-    <div class="menu-divider"></div>
-    <div class="menu-item">💬 <span>Feedback</span></div>
-    <div class="menu-item">❓ <span>Ayuda</span></div>
-    <div id="menu-version">ORVEX v1.0.0 · orvex-chi.vercel.app</div>
-  </div>
-</div>
-
-<!-- HERO -->
 <div id="hero">
   <canvas id="hero-canvas"></canvas>
-  <div id="hero-overlay"></div>
-  <div id="hero-text">
-    <div id="hero-title1">EL MUNDO</div>
-    <div id="hero-title2">EN TIEMPO REAL</div>
-    <div id="hero-sub">Explora. Entiende. Anticípate.</div>
-  </div>
-  <div id="activity-box">
-    <div id="act-label">ACTIVIDAD GLOBAL</div>
-    <b id="act-count">14,021</b>
-    <div id="act-change">▲ 18.6% últimas 24h</div>
+  <div id="hero-content">
+    <div id="hero-left">
+      <div id="hero-t1">EL MUNDO</div>
+      <div id="hero-t2">EN TIEMPO REAL</div>
+      <div id="hero-sub">EXPLORA · ENTIENDE · ANTICÍPATE</div>
+    </div>
+    <div id="hero-right">
+      <div id="act-label">ACTIVIDAD GLOBAL</div>
+      <span id="act-num">14,021</span>
+      <div id="act-delta">▲ 18.6% últimas 24h</div>
+    </div>
   </div>
 </div>
 
-<!-- GLOBE OVAL MAP -->
 <div id="globe-section">
-  <div id="globe-wrapper">
-    <div id="map"></div>
+  <div id="globe-container">
+    <div id="globe-glow"></div>
+    <svg id="globe-svg" viewBox="0 0 220 188"></svg>
   </div>
+  <button id="radar-btn">⊕ MODO RADAR</button>
 </div>
 
-<!-- CATEGORIES -->
 <div id="categories">
   <button class="cat-btn active" data-cat="all"><span class="cat-dot" style="background:#fff"></span>Todos</button>
-  <button class="cat-btn" data-cat="world"><span class="cat-dot" style="background:#ff3b3b"></span>Conflictos</button>
-  <button class="cat-btn" data-cat="business"><span class="cat-dot" style="background:#00e87a"></span>Economía</button>
-  <button class="cat-btn" data-cat="technology"><span class="cat-dot" style="background:#00b4ff"></span>Tecnología</button>
-  <button class="cat-btn" data-cat="health"><span class="cat-dot" style="background:#9b59ff"></span>Salud</button>
-  <button class="cat-btn" data-cat="science"><span class="cat-dot" style="background:#ff8c00"></span>Ciencia</button>
-  <button class="cat-btn" data-cat="sports"><span class="cat-dot" style="background:#ffd700"></span>Deportes</button>
+  <button class="cat-btn" data-cat="world"><span class="cat-dot" style="background:#ff2d55"></span>Conflictos</button>
+  <button class="cat-btn" data-cat="business"><span class="cat-dot" style="background:#30d158"></span>Economía</button>
+  <button class="cat-btn" data-cat="technology"><span class="cat-dot" style="background:#0a84ff"></span>Tecnología</button>
+  <button class="cat-btn" data-cat="health"><span class="cat-dot" style="background:#bf5af2"></span>Salud</button>
+  <button class="cat-btn" data-cat="science"><span class="cat-dot" style="background:#ff9f0a"></span>Ciencia</button>
+  <button class="cat-btn" data-cat="sports"><span class="cat-dot" style="background:#ffd60a"></span>Deportes</button>
 </div>
 
-<!-- NEWS -->
 <div id="news-section">
-  <div id="news-header">
-    <div id="news-header-left"><div id="news-dot"></div>EN DIRECTO</div>
-    <button id="ver-todas-btn" onclick="openModal()">Ver todas</button>
+  <div id="news-hdr">
+    <div id="news-hdr-left"><div id="ndot"></div>EN DIRECTO</div>
+    <button id="ver-btn" onclick="openModal()">VER TODAS →</button>
   </div>
   <div id="news-list"></div>
 </div>
 
-<!-- MARKETS -->
-<div id="markets-section">
-  <div id="markets-header">
-    <div id="markets-title">MERCADOS EN VIVO</div>
-    <div id="markets-ver" onclick="openModal()">Ver todas</div>
+<div id="mkt-section">
+  <div id="mkt-hdr">
+    <div id="mkt-title">MERCADOS EN VIVO</div>
+    <div id="mkt-ver" onclick="openModal()">VER TODAS</div>
   </div>
-  <div id="markets-row">
-    <div class="market-card">
-      <div class="market-icon">₿</div>
-      <div class="market-name">BTC / USD</div>
-      <div class="market-price" id="m-btc">63,245</div>
-      <div class="market-change up" id="m-btc-c">+2.35%</div>
-      <div class="spark" id="spark-btc"></div>
-    </div>
-    <div class="market-card">
-      <div class="market-icon">🛢</div>
-      <div class="market-name">PETRÓLEO</div>
-      <div class="market-price" id="m-oil">82.45</div>
-      <div class="market-change down" id="m-oil-c">-1.42%</div>
-      <div class="spark" id="spark-oil"></div>
-    </div>
-    <div class="market-card">
-      <div class="market-icon">🥇</div>
-      <div class="market-name">ORO</div>
-      <div class="market-price" id="m-gold">2,338</div>
-      <div class="market-change up" id="m-gold-c">+0.71%</div>
-      <div class="spark" id="spark-gold"></div>
-    </div>
-    <div class="market-card">
-      <div class="market-icon">📈</div>
-      <div class="market-name">S&P 500</div>
-      <div class="market-price" id="m-sp">5,072</div>
-      <div class="market-change down" id="m-sp-c">-0.28%</div>
-      <div class="spark" id="spark-sp"></div>
-    </div>
+  <div id="mkt-row">
+    <div class="mc"><div class="mc-icon">₿</div><div class="mc-name">BTC/USD</div><div class="mc-price" id="m-btc">63,245</div><div class="mc-chg up" id="mc-btc">+2.35%</div><div class="spark" id="sp-btc"></div></div>
+    <div class="mc"><div class="mc-icon">🛢</div><div class="mc-name">PETRÓLEO</div><div class="mc-price" id="m-oil">82.45</div><div class="mc-chg down" id="mc-oil">-1.42%</div><div class="spark" id="sp-oil"></div></div>
+    <div class="mc"><div class="mc-icon">🥇</div><div class="mc-name">ORO</div><div class="mc-price" id="m-gold">2,338</div><div class="mc-chg up" id="mc-gold">+0.71%</div><div class="spark" id="sp-gold"></div></div>
+    <div class="mc"><div class="mc-icon">📈</div><div class="mc-name">S&P 500</div><div class="mc-price" id="m-sp">5,072</div><div class="mc-chg down" id="mc-sp">-0.28%</div><div class="spark" id="sp-sp"></div></div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
-<div id="bottom-nav">
-  <div class="nav-item active"><div class="nav-icon">🌍</div><div class="nav-label">Mapa</div></div>
-  <div class="nav-item"><div class="nav-icon">📈</div><div class="nav-label">Tendencias</div></div>
-  <div id="nav-center-wrap"><div id="nav-center">🎯</div></div>
-  <div class="nav-item"><div class="nav-icon">🔔</div><div class="nav-label">Alertas</div></div>
-  <div class="nav-item"><div class="nav-icon">🔖</div><div class="nav-label">Guardados</div></div>
+<div id="bnav">
+  <div class="bni active"><div class="bni-icon">🌍</div><div class="bni-label">MAPA</div></div>
+  <div class="bni"><div class="bni-icon">📈</div><div class="bni-label">TRENDS</div></div>
+  <div id="bnav-center"><div id="bnav-fab">🎯</div></div>
+  <div class="bni"><div class="bni-icon">🔔</div><div class="bni-label">ALERTAS</div></div>
+  <div class="bni"><div class="bni-icon">🔖</div><div class="bni-label">SAVED</div></div>
 </div>
 
-<!-- MODAL VER TODAS -->
-<div id="modal-overlay">
+<!-- SIDE MENU -->
+<div id="overlay"></div>
+<div id="smenu">
+  <div id="smenu-x" onclick="closeMenu()">✕</div>
+  <div id="smenu-hdr"><div id="smenu-logo">ORVEX</div><div id="smenu-tag">SEE THE WORLD FIRST</div></div>
+  <div class="smi" onclick="closeMenu()"><span class="smi-ic">🌍</span>Mapa Mundial</div>
+  <div class="smi"><span class="smi-ic">📈</span>Tendencias</div>
+  <div class="smi"><span class="smi-ic">🔔</span>Alertas</div>
+  <div class="smi"><span class="smi-ic">🔖</span>Guardados</div>
+  <div class="smi-div"></div>
+  <div class="smi"><span class="smi-ic">⚙️</span>Configuración</div>
+  <div class="smi"><span class="smi-ic">🌙</span>Modo Oscuro</div>
+  <div class="smi"><span class="smi-ic">📤</span>Compartir App</div>
+  <div class="smi-div"></div>
+  <div class="smi"><span class="smi-ic">💬</span>Feedback</div>
+  <div class="smi"><span class="smi-ic">❓</span>Ayuda</div>
+  <div id="smenu-ver">ORVEX v1.0.0 · orvex-chi.vercel.app</div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-wrap">
   <div id="modal">
-    <div id="modal-handle"></div>
-    <div id="modal-header">
-      <div id="modal-title">TODAS LAS NOTICIAS</div>
-      <button id="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div id="modal-list"></div>
+    <div id="modal-pill"></div>
+    <div id="modal-hdr"><div id="modal-ttl">TODAS LAS NOTICIAS</div><div id="modal-x" onclick="closeModal()">✕</div></div>
+    <div id="modal-body"></div>
   </div>
 </div>
 
 <script>
-const catColors={all:'#fff',world:'#ff3b3b',business:'#00e87a',technology:'#00b4ff',health:'#9b59ff',science:'#ff8c00',sports:'#ffd700'};
-const catIcons={world:'💥',business:'📊',technology:'💻',health:'💊',science:'🔬',sports:'⚽'};
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+const CAT_COLORS={all:'#fff',world:'#ff2d55',business:'#30d158',technology:'#0a84ff',health:'#bf5af2',science:'#ff9f0a',sports:'#ffd60a'};
+const CAT_ICONS={world:'💥',business:'📊',technology:'💻',health:'💊',science:'🔬',sports:'⚽'};
 
-const countryCoords={
-  us:{name:'EE. UU.',lat:37.09,lng:-95.71},gb:{name:'Reino Unido',lat:55.37,lng:-3.43},
-  de:{name:'Alemania',lat:51.16,lng:10.45},fr:{name:'Francia',lat:46.22,lng:2.21},
-  jp:{name:'Japón',lat:36.20,lng:138.25},cn:{name:'China',lat:35.86,lng:104.19},
-  in:{name:'India',lat:20.59,lng:78.96},br:{name:'Brasil',lat:-14.23,lng:-51.92},
-  ru:{name:'Rusia',lat:61.52,lng:105.31},au:{name:'Australia',lat:-25.27,lng:133.77},
-  mx:{name:'México',lat:23.63,lng:-102.55},es:{name:'España',lat:40.46,lng:-3.74},
-  ar:{name:'Argentina',lat:-38.41,lng:-63.61},pe:{name:'Perú',lat:-9.19,lng:-75.01},
-  za:{name:'Sudáfrica',lat:-30.55,lng:22.93},ng:{name:'Nigeria',lat:9.08,lng:8.67},
-  eg:{name:'Egipto',lat:26.82,lng:30.80},kr:{name:'Corea del Sur',lat:35.90,lng:127.76},
-  ae:{name:'Emiratos',lat:23.42,lng:53.84},ua:{name:'Ucrania',lat:48.37,lng:31.16},
-  ir:{name:'Irán',lat:32.42,lng:53.68},co:{name:'Colombia',lat:4.57,lng:-74.29},
+const GEO={
+  us:[37.09,-95.71,'EE. UU.'],gb:[55.37,-3.43,'Reino Unido'],de:[51.16,10.45,'Alemania'],
+  fr:[46.22,2.21,'Francia'],jp:[36.20,138.25,'Japón'],cn:[35.86,104.19,'China'],
+  in:[20.59,78.96,'India'],br:[-14.23,-51.92,'Brasil'],ru:[61.52,105.31,'Rusia'],
+  au:[-25.27,133.77,'Australia'],mx:[23.63,-102.55,'México'],es:[40.46,-3.74,'España'],
+  ar:[-38.41,-63.61,'Argentina'],pe:[-9.19,-75.01,'Perú'],za:[-30.55,22.93,'Sudáfrica'],
+  ng:[9.08,8.67,'Nigeria'],eg:[26.82,30.80,'Egipto'],kr:[35.90,127.76,'Corea del Sur'],
+  ae:[23.42,53.84,'Emiratos'],ua:[48.37,31.16,'Ucrania'],ir:[32.42,53.68,'Irán'],
 };
 
-const fallbackNews=[
-  {title:'Explosiones reportadas en el centro de Kiev',source:'Reuters',cat:'world',country:'ua',time:'Hace 2 min',urgent:true},
-  {title:'Tensión militar elevada en la región de Irán',source:'Al Jazeera',cat:'world',country:'ir',time:'Hace 15 min'},
-  {title:'Caída del mercado bursátil japonés más del 3%',source:'Bloomberg',cat:'business',country:'jp',time:'Hace 7 min'},
-  {title:'Protestas masivas en São Paulo, Brasil',source:'BBC',cat:'world',country:'br',time:'Hace 32 min'},
-  {title:'La oposición lidera primeros resultados en Sudáfrica',source:'CNN',cat:'world',country:'za',time:'Hace 11 min'},
-  {title:'Empresa de EE. UU. lanza nuevo modelo de IA',source:'TechCrunch',cat:'technology',country:'us',time:'Hace 14 min'},
-  {title:'Nuevo tratamiento contra el cáncer logra resultados históricos',source:'Lancet',cat:'health',country:'gb',time:'Hace 28 min'},
-  {title:'Acuerdo comercial firmado entre bloques económicos',source:'FT',cat:'business',country:'de',time:'Hace 41 min'},
-  {title:'SpaceX lanza misión tripulada a la estación espacial',source:'Space.com',cat:'science',country:'us',time:'Hace 55 min'},
-  {title:'Champions League: clasificados a cuartos de final',source:'ESPN',cat:'sports',country:'es',time:'Hace 1h 2min'},
-  {title:'Terremoto de magnitud 5.8 sacude la costa del Pacífico',source:'USGS',cat:'world',country:'pe',time:'Hace 1h 20min'},
-  {title:'Bitcoin supera nuevo récord histórico en mercados globales',source:'CoinDesk',cat:'business',country:'us',time:'Hace 1h 35min'},
-  {title:'OMS alerta sobre nuevo brote de dengue en Asia',source:'OMS',cat:'health',country:'in',time:'Hace 2h'},
-  {title:'Descubrimiento arqueológico revela nueva civilización',source:'Nat Geo',cat:'science',country:'eg',time:'Hace 2h 20min'},
-  {title:'Copa del Mundo: equipos clasificados a cuartos',source:'FIFA',cat:'sports',country:'fr',time:'Hace 2h 40min'},
+const FALLBACK=[
+  {title:'Explosiones reportadas en el centro de Kiev',src:'Reuters',cat:'world',cc:'ua',t:'Hace 2 min',urg:true},
+  {title:'Tensión militar elevada en la región persa',src:'Al Jazeera',cat:'world',cc:'ir',t:'Hace 15 min'},
+  {title:'Caída del mercado bursátil japonés más del 3%',src:'Bloomberg',cat:'business',cc:'jp',t:'Hace 7 min'},
+  {title:'Protestas masivas en São Paulo, Brasil',src:'BBC World',cat:'world',cc:'br',t:'Hace 32 min'},
+  {title:'La oposición lidera primeros resultados en Sudáfrica',src:'CNN',cat:'world',cc:'za',t:'Hace 11 min'},
+  {title:'Empresa de EE. UU. lanza nuevo modelo de IA generativa',src:'TechCrunch',cat:'technology',cc:'us',t:'Hace 14 min'},
+  {title:'Nuevo tratamiento contra el cáncer logra resultados históricos',src:'Lancet',cat:'health',cc:'gb',t:'Hace 28 min'},
+  {title:'Acuerdo comercial firmado entre bloques económicos rivales',src:'FT',cat:'business',cc:'de',t:'Hace 41 min'},
+  {title:'SpaceX lanza misión tripulada a la estación espacial',src:'Space.com',cat:'science',cc:'us',t:'Hace 55 min'},
+  {title:'Champions League: clasificados a cuartos de final',src:'ESPN',cat:'sports',cc:'es',t:'Hace 1h 2min'},
+  {title:'Terremoto de magnitud 5.8 sacude la costa del Pacífico',src:'USGS',cat:'world',cc:'pe',t:'Hace 1h 20min'},
+  {title:'Bitcoin supera nuevo récord histórico en mercados globales',src:'CoinDesk',cat:'business',cc:'us',t:'Hace 1h 35min'},
+  {title:'OMS alerta sobre nuevo brote de dengue en Asia',src:'OMS',cat:'health',cc:'in',t:'Hace 2h'},
+  {title:'Descubrimiento arqueológico revela nueva civilización antigua',src:'Nat Geo',cat:'science',cc:'eg',t:'Hace 2h 20min'},
+  {title:'Copa del Mundo: equipos clasificados a semifinales',src:'FIFA',cat:'sports',cc:'fr',t:'Hace 2h 40min'},
 ];
 
-const RSS_FEEDS=[
-  {url:'https://feeds.bbci.co.uk/news/world/rss.xml',source:'BBC World',cat:'world',country:'gb'},
-  {url:'https://feeds.bbci.co.uk/news/technology/rss.xml',source:'BBC Tech',cat:'technology',country:'gb'},
-  {url:'https://feeds.bbci.co.uk/news/business/rss.xml',source:'BBC Business',cat:'business',country:'gb'},
-  {url:'https://feeds.bbci.co.uk/news/health/rss.xml',source:'BBC Health',cat:'health',country:'gb'},
-  {url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',source:'BBC Science',cat:'science',country:'gb'},
-  {url:'https://feeds.bbci.co.uk/sport/rss.xml',source:'BBC Sport',cat:'sports',country:'gb'},
-  {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',source:'NY Times',cat:'world',country:'us'},
-  {url:'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',source:'NY Times Tech',cat:'technology',country:'us'},
+const RSS=[
+  {url:'https://feeds.bbci.co.uk/news/world/rss.xml',src:'BBC World',cat:'world',cc:'gb'},
+  {url:'https://feeds.bbci.co.uk/news/technology/rss.xml',src:'BBC Tech',cat:'technology',cc:'gb'},
+  {url:'https://feeds.bbci.co.uk/news/business/rss.xml',src:'BBC Business',cat:'business',cc:'gb'},
+  {url:'https://feeds.bbci.co.uk/news/health/rss.xml',src:'BBC Health',cat:'health',cc:'gb'},
+  {url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',src:'BBC Science',cat:'science',cc:'gb'},
+  {url:'https://feeds.bbci.co.uk/sport/rss.xml',src:'BBC Sport',cat:'sports',cc:'gb'},
+  {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',src:'NY Times',cat:'world',cc:'us'},
+  {url:'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',src:'NY Times Tech',cat:'technology',cc:'us'},
 ];
 
-let map,markers=[],allNews=[...fallbackNews],activeFilter='all';
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let allNews=[...FALLBACK],activeFilter='all',globeDots=[],isDragging=false;
+let rotX=0,rotY=0,prevX=0,prevY=0;
 
-// MAP INIT
-function initMap(){
-  map=L.map('map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false}).setView([20,10],1);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
-}
-
+// ══════════════════════════════════════
 // HERO CANVAS
+// ══════════════════════════════════════
 function drawHero(){
-  const canvas=document.getElementById('hero-canvas');
-  const ctx=canvas.getContext('2d');
-  canvas.width=window.innerWidth*2;canvas.height=130*2;ctx.scale(2,2);
-  const w=window.innerWidth,h=130;
-  for(let i=0;i<120;i++){
-    const x=Math.random()*w,y=Math.random()*h;
-    const colors=['#ff3b3b','#9b59ff','#00e87a','#ff8c00','#00b4ff','#ffd700','#fff'];
-    ctx.beginPath();ctx.arc(x,y,Math.random()*1.5+0.3,0,Math.PI*2);
-    ctx.fillStyle=colors[Math.floor(Math.random()*colors.length)];
-    ctx.globalAlpha=0.3+Math.random()*0.5;ctx.fill();
+  const c=document.getElementById('hero-canvas'),ctx=c.getContext('2d');
+  c.width=window.innerWidth*devicePixelRatio;c.height=100*devicePixelRatio;
+  ctx.scale(devicePixelRatio,devicePixelRatio);
+  const w=window.innerWidth,h=100,cols=['#ff2d55','#bf5af2','#30d158','#ff9f0a','#0a84ff','#ffd60a','#64d2ff'];
+  for(let i=0;i<150;i++){
+    ctx.beginPath();ctx.arc(Math.random()*w,Math.random()*h,Math.random()*1.2+0.2,0,Math.PI*2);
+    ctx.fillStyle=cols[Math.floor(Math.random()*cols.length)];
+    ctx.globalAlpha=0.2+Math.random()*0.5;ctx.fill();
   }
   ctx.globalAlpha=1;
 }
 
-function jitter(lat,lng){return[lat+(Math.random()-0.5)*5,lng+(Math.random()-0.5)*5];}
-function getCoords(c){const d=countryCoords[c]||countryCoords.us;return jitter(d.lat,d.lng);}
-function getCountryName(c){return(countryCoords[c]||{name:'Mundial'}).name;}
-function timeAgo(d){
-  try{const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);
-  if(m<1)return'Ahora';if(m<60)return'Hace '+m+' min';
-  const h=Math.floor(m/60);if(h<24)return'Hace '+h+'h';return'Hace '+Math.floor(h/24)+'d';}
-  catch(e){return'Reciente';}
+// ══════════════════════════════════════
+// D3 GLOBE
+// ══════════════════════════════════════
+async function initGlobe(){
+  const svg=d3.select('#globe-svg');
+  const W=220,H=188,R=88;
+  const proj=d3.geoOrthographic().scale(R).translate([W/2,H/2]).clipAngle(90).rotate([rotY,-rotX]);
+  const path=d3.geoPath().projection(proj);
+
+  // Sphere background
+  svg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',R)
+    .attr('fill','#010d1e')
+    .attr('stroke','rgba(0,180,255,0.2)').attr('stroke-width',1);
+
+  // Glow effect
+  const defs=svg.append('defs');
+  const filter=defs.append('filter').attr('id','glow');
+  filter.append('feGaussianBlur').attr('stdDeviation','3').attr('result','blur');
+  const feMerge=filter.append('feMerge');
+  feMerge.append('feMergeNode').attr('in','blur');
+  feMerge.append('feMergeNode').attr('in','SourceGraphic');
+
+  // Graticule
+  const grat=d3.geoGraticule()();
+  const gratPath=svg.append('path').datum(grat).attr('class','graticule').attr('d',path);
+
+  // Countries
+  let world;
+  try{
+    const res=await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+    world=await res.json();
+  }catch(e){world=null;}
+
+  let countryPaths;
+  if(world){
+    const {feature}=await import('https://cdn.skypack.dev/topojson-client@3');
+    const countries=feature(world,world.objects.countries);
+    const contColors={'002':'#0d2035','019':'#0a1e30','142':'#0e2238','150':'#091828','009':'#0c2133'};
+    countryPaths=svg.append('g').selectAll('path')
+      .data(countries.features).enter().append('path')
+      .attr('class','country-path')
+      .attr('d',path)
+      .attr('fill',(d)=>{
+        const id=d.id;
+        if([840,484,076,032,152,604,170,591,591,862].includes(+id))return '#0a1e30';
+        if([826,276,250,380,724,752,578,208,246,372].includes(+id))return '#091828';
+        if([156,392,410,356,360,458].includes(+id))return '#0e2238';
+        if([643,804,616,203,348,642].includes(+id))return '#0b1f35';
+        return '#0a1828';
+      })
+      .attr('stroke','rgba(0,160,255,0.3)').attr('stroke-width',0.4);
+  }
+
+  // Outline
+  svg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',R)
+    .attr('fill','none').attr('stroke','rgba(0,180,255,0.18)').attr('stroke-width',1.5);
+
+  // News dots group
+  const dotsG=svg.append('g').attr('id','dots-g');
+
+  function updateGlobe(){
+    proj.rotate([rotY,-rotX]);
+    path.projection(proj);
+    gratPath.attr('d',path);
+    if(countryPaths)countryPaths.attr('d',path);
+    updateDots(dotsG,proj,path);
+  }
+
+  // Drag to rotate
+  const globeSvg=document.getElementById('globe-svg');
+  globeSvg.addEventListener('mousedown',e=>{isDragging=true;prevX=e.clientX;prevY=e.clientY;});
+  globeSvg.addEventListener('touchstart',e=>{isDragging=true;prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
+  window.addEventListener('mousemove',e=>{
+    if(!isDragging)return;
+    rotY+=(e.clientX-prevX)*0.3;rotX+=(e.clientY-prevY)*0.3;
+    prevX=e.clientX;prevY=e.clientY;updateGlobe();
+  });
+  window.addEventListener('touchmove',e=>{
+    if(!isDragging)return;
+    rotY+=(e.touches[0].clientX-prevX)*0.3;rotX+=(e.touches[0].clientY-prevY)*0.3;
+    prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;updateGlobe();
+  },{passive:true});
+  window.addEventListener('mouseup',()=>isDragging=false);
+  window.addEventListener('touchend',()=>isDragging=false);
+
+  // Auto rotate
+  let autoRot=setInterval(()=>{if(!isDragging){rotY+=0.15;updateGlobe();}},30);
+
+  updateGlobe();
+  window._updateGlobe=updateGlobe;
 }
 
+function updateDots(g,proj,path){
+  g.selectAll('*').remove();
+  const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
+  filtered.forEach((n,i)=>{
+    const geo=GEO[n.cc]||GEO.us;
+    const lat=geo[0]+(Math.random()-0.5)*3;
+    const lng=geo[1]+(Math.random()-0.5)*3;
+    const p=proj([lng,lat]);
+    if(!p)return;
+    const col=CAT_COLORS[n.cat]||'#fff';
+    const visible=d3.geoDistance([lng,lat],proj.invert([220/2,188/2]))<Math.PI/2;
+    if(!visible)return;
+    // Pulse ring
+    g.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3)
+      .attr('fill','none').attr('stroke',col).attr('stroke-width',1).attr('opacity',0.3)
+      .append('animate').attr('attributeName','r').attr('from',3).attr('to',10)
+      .attr('dur',(1.5+Math.random())+'s').attr('repeatCount','indefinite');
+    g.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3)
+      .attr('fill','none').attr('stroke',col).attr('stroke-width',1).attr('opacity',0.15)
+      .append('animate').attr('attributeName','opacity').attr('from',0.15).attr('to',0)
+      .attr('dur',(1.5+Math.random())+'s').attr('repeatCount','indefinite');
+    // Core dot
+    g.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3.5)
+      .attr('fill',col).attr('stroke','rgba(255,255,255,0.8)').attr('stroke-width',0.8)
+      .attr('filter','url(#glow)').style('cursor','pointer')
+      .on('click',()=>{
+        const idx=allNews.indexOf(n);
+        if(idx>=0)document.getElementById('news-'+idx)?.scrollIntoView({behavior:'smooth',block:'nearest'});
+      });
+  });
+}
+
+// ══════════════════════════════════════
+// NEWS RENDER
+// ══════════════════════════════════════
+function getCountryName(cc){return GEO[cc]?GEO[cc][2]:'Mundial';}
+function timeAgo(d){
+  try{const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);
+  if(m<1)return'AHORA';if(m<60)return'Hace '+m+' min';
+  const h=Math.floor(m/60);return h<24?'Hace '+h+'h':'Hace '+Math.floor(h/24)+'d';}
+  catch(e){return'RECIENTE';}
+}
+
+function makeNI(n,i,forModal=false){
+  const col=CAT_COLORS[n.cat]||'#fff';
+  const thumb=n.img
+    ?`<img class="ni-thumb" src="${n.img}" onerror="this.style.display='none'" alt=""/>`
+    :`<div class="ni-icon" style="background:${col}15">${CAT_ICONS[n.cat]||'📰'}</div>`;
+  return `${thumb}
+  <div class="ni-body">
+    <div class="ni-top">
+      ${n.urg?'<span class="ni-urg">URGENTE</span>':''}
+      <span class="ni-src" style="color:${col}">${n.src}</span>
+    </div>
+    <div class="ni-title">${n.title.slice(0,78)}${n.title.length>78?'...':''}</div>
+    <div class="ni-time">${n.t}</div>
+  </div>
+  <div class="ni-country">${getCountryName(n.cc)}</div>
+  <div class="ni-arr">›</div>`;
+}
+
+function renderNews(){
+  const list=document.getElementById('news-list');
+  list.innerHTML='';
+  const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
+  filtered.forEach((n,i)=>{
+    const el=document.createElement('div');
+    el.className='ni';el.id='news-'+i;
+    el.innerHTML=makeNI(n,i);
+    el.onclick=()=>{
+      document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
+      el.classList.add('active');
+    };
+    list.appendChild(el);
+  });
+  renderModal(filtered);
+  if(window._updateGlobe)window._updateGlobe();
+}
+
+function renderModal(filtered){
+  const mb=document.getElementById('modal-body');mb.innerHTML='';
+  filtered.forEach((n,i)=>{
+    const el=document.createElement('div');el.className='ni';
+    el.innerHTML=makeNI(n,i,true);
+    el.onclick=()=>{closeModal();setTimeout(()=>document.getElementById('news-'+i)?.scrollIntoView({behavior:'smooth'}),300);};
+    mb.appendChild(el);
+  });
+}
+
+// ══════════════════════════════════════
 // RSS FETCH
+// ══════════════════════════════════════
 async function fetchRSS(){
   try{
-    const results=await Promise.allSettled(RSS_FEEDS.map(async f=>{
+    const results=await Promise.allSettled(RSS.map(async f=>{
       const res=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(f.url));
       const data=await res.json();
       if(data.status==='ok'&&data.items){
         return data.items.slice(0,5).map(item=>({
-          title:item.title,source:f.source,cat:f.cat,country:f.country,
-          url:item.link||'#',image:item.thumbnail||null,time:timeAgo(item.pubDate),
+          title:item.title,src:f.src,cat:f.cat,cc:f.cc,
+          url:item.link||'#',img:item.thumbnail||null,t:timeAgo(item.pubDate),
         }));
       }return[];
     }));
     const fetched=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
     if(fetched.length>3)allNews=fetched;
   }catch(e){}
-  document.getElementById('act-count').textContent=(allNews.length*471).toLocaleString();
-  renderAll();
+  document.getElementById('act-num').textContent=(allNews.length*471).toLocaleString();
+  renderNews();
 }
 
-function makeNewsItemHTML(n,i,coords){
-  const color=catColors[n.cat]||'#fff';
-  const thumb=n.image
-    ?`<img class="news-thumb" src="${n.image}" onerror="this.style.display='none'" alt=""/>`
-    :`<div class="news-thumb-icon" style="background:${color}18">${catIcons[n.cat]||'📰'}</div>`;
-  return `${thumb}
-    <div class="news-body">
-      <div class="news-top">
-        ${n.urgent?'<span class="news-urgent">URGENTE</span>':''}
-        <span class="news-source-tag" style="color:${color}">${n.source}</span>
-      </div>
-      <div class="news-title">${n.title.slice(0,80)}${n.title.length>80?'...':''}</div>
-      <div class="news-time">${n.time}</div>
-    </div>
-    <div class="news-country">${getCountryName(n.country)}</div>
-    <div class="news-arrow">›</div>`;
-}
+// ══════════════════════════════════════
+// UI INTERACTIONS
+// ══════════════════════════════════════
+function openMenu(){document.getElementById('overlay').classList.add('on');document.getElementById('smenu').classList.add('on');}
+function closeMenu(){document.getElementById('overlay').classList.remove('on');document.getElementById('smenu').classList.remove('on');}
+function openModal(){document.getElementById('modal-wrap').classList.add('on');}
+function closeModal(){document.getElementById('modal-wrap').classList.remove('on');}
 
-function renderAll(){
-  markers.forEach(m=>map.removeLayer(m));markers=[];
-  const list=document.getElementById('news-list');list.innerHTML='';
-  const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
-
-  filtered.forEach((n,i)=>{
-    const color=catColors[n.cat]||'#fff';
-    const coords=getCoords(n.country);
-    const html=`<div style="position:relative;width:30px;height:30px;">
-      <div style="position:absolute;top:0;left:0;width:30px;height:30px;border-radius:50%;border:1px solid ${color};opacity:0.25;animation:rp ${1.8+i*0.1}s ${i*0.12}s infinite ease-out;"></div>
-      <div style="position:absolute;top:8px;left:8px;width:14px;height:14px;border-radius:50%;background:${color};box-shadow:0 0 8px ${color};border:1.5px solid rgba(255,255,255,0.8);"></div>
-    </div>`;
-    const m=L.marker([coords[0],coords[1]],{icon:L.divIcon({className:'',html,iconSize:[30,30],iconAnchor:[15,15]})}).addTo(map);
-    m.bindPopup(`<div class="popup-loc">${getCountryName(n.country)}</div><div class="popup-title">${n.title.slice(0,65)}...</div><div class="popup-time">${n.source} · ${n.time}</div>`);
-    m.on('click',()=>highlightNews(i));
-    markers.push(m);
-
-    const item=document.createElement('div');
-    item.className='news-item';item.id='news-'+i;
-    item.onclick=(()=>{const idx=i,la=coords[0],ln=coords[1];return()=>{map.setView([la,ln],3,{animate:true});markers[idx]&&markers[idx].openPopup();highlightNews(idx);};})();
-    item.innerHTML=makeNewsItemHTML(n,i,coords);
-    list.appendChild(item);
-  });
-
-  renderModal(filtered);
-}
-
-function renderModal(filtered){
-  const ml=document.getElementById('modal-list');ml.innerHTML='';
-  filtered.forEach((n,i)=>{
-    const item=document.createElement('div');
-    item.className='news-item';
-    item.innerHTML=makeNewsItemHTML(n,i,[0,0]);
-    item.onclick=()=>{closeModal();document.getElementById('news-'+i)&&document.getElementById('news-'+i).click();};
-    ml.appendChild(item);
-  });
-}
-
-function highlightNews(idx){
-  document.querySelectorAll('.news-item').forEach(n=>n.classList.remove('active'));
-  const el=document.getElementById('news-'+idx);
-  if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
-}
-
-// MENU
-function openMenu(){document.getElementById('menu-overlay').classList.add('open');document.getElementById('side-menu').classList.add('open');}
-function closeMenu(){document.getElementById('menu-overlay').classList.remove('open');document.getElementById('side-menu').classList.remove('open');}
 document.getElementById('menu-btn').onclick=openMenu;
-document.getElementById('menu-close').onclick=closeMenu;
-document.getElementById('menu-overlay').onclick=function(e){if(e.target===this)closeMenu();};
+document.getElementById('overlay').onclick=e=>{if(e.target===document.getElementById('overlay'))closeMenu();};
+document.getElementById('modal-wrap').onclick=e=>{if(e.target===document.getElementById('modal-wrap'))closeModal();};
 
-// MODAL
-function openModal(){document.getElementById('modal-overlay').classList.add('open');}
-function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
-document.getElementById('modal-overlay').onclick=function(e){if(e.target===this)closeModal();};
-
-// CATEGORIES
 document.querySelectorAll('.cat-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');activeFilter=btn.dataset.cat;renderAll();
+    btn.classList.add('active');activeFilter=btn.dataset.cat;renderNews();
   });
 });
 
-// NAV
-document.querySelectorAll('.nav-item').forEach(item=>{
-  item.addEventListener('click',()=>{
-    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-    item.classList.add('active');
-  });
+document.querySelectorAll('.bni').forEach(item=>{
+  item.addEventListener('click',()=>{document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));item.classList.add('active');});
 });
 
-// SPARKLINES
+// ══════════════════════════════════════
+// MARKETS
+// ══════════════════════════════════════
 function initSparks(){
   [['btc',true],['oil',false],['gold',true],['sp',false]].forEach(([id,up])=>{
-    const el=document.getElementById('spark-'+id);if(!el)return;
+    const el=document.getElementById('sp-'+id);if(!el)return;
     for(let i=0;i<7;i++){
-      const b=document.createElement('div');b.className='spark-bar';
-      b.style.height=(5+Math.random()*11)+'px';
+      const b=document.createElement('div');b.className='sb';
+      b.style.height=(4+Math.random()*10)+'px';
       b.style.background=up?'var(--green)':'var(--red)';
-      b.style.opacity='0.5';el.appendChild(b);
+      el.appendChild(b);
     }
   });
 }
 
-// MARKETS
 function animateMarkets(){
   const m=[
-    {id:'m-btc',cid:'m-btc-c',base:63245,dec:0},
-    {id:'m-oil',cid:'m-oil-c',base:82.45,dec:2},
-    {id:'m-gold',cid:'m-gold-c',base:2338,dec:0},
-    {id:'m-sp',cid:'m-sp-c',base:5072,dec:0},
+    {id:'m-btc',cid:'mc-btc',base:63245,dec:0},
+    {id:'m-oil',cid:'mc-oil',base:82.45,dec:2},
+    {id:'m-gold',cid:'mc-gold',base:2338,dec:0},
+    {id:'m-sp',cid:'mc-sp',base:5072,dec:0},
   ];
   setInterval(()=>{
     m.forEach(mk=>{
       const chg=(Math.random()-0.48)*0.3;mk.base*=(1+chg/100);
-      const el=document.getElementById(mk.id);const cel=document.getElementById(mk.cid);
+      const el=document.getElementById(mk.id),cel=document.getElementById(mk.cid);
       if(el)el.textContent=mk.dec?mk.base.toFixed(mk.dec):Math.round(mk.base).toLocaleString();
-      if(cel){cel.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';cel.className='market-change '+(chg>=0?'up':'down');}
+      if(cel){cel.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';cel.className='mc-chg '+(chg>=0?'up':'down');}
     });
   },3000);
 }
 
 function animateCount(){
   let c=14021;
-  setInterval(()=>{c+=Math.floor(Math.random()*8-2);document.getElementById('act-count').textContent=c.toLocaleString();},2500);
+  setInterval(()=>{c+=Math.floor(Math.random()*8-2);document.getElementById('act-num').textContent=c.toLocaleString();},2500);
 }
 
-const s=document.createElement('style');
-s.textContent='@keyframes rp{0%{transform:scale(0.5);opacity:0.7}100%{transform:scale(2.5);opacity:0}}';
-document.head.appendChild(s);
-
-window.addEventListener('load',()=>{
-  initMap();drawHero();initSparks();animateMarkets();animateCount();
-  renderAll();fetchRSS();
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+window.addEventListener('load',async()=>{
+  drawHero();
+  initSparks();
+  animateMarkets();
+  animateCount();
+  renderNews();
+  await initGlobe();
+  fetchRSS();
   setInterval(fetchRSS,300000);
 });
 window.addEventListener('resize',drawHero);
