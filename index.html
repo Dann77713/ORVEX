@@ -2,114 +2,256 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ORVEX — El Mundo en Tiempo Real</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Courier New',monospace;background:#050a0f;color:#e0f0ff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-#header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(5,10,20,0.97);border-bottom:1px solid rgba(0,180,255,0.2);z-index:1000;flex-shrink:0}
-#logo{font-size:22px;font-weight:700;letter-spacing:5px;color:#00cfff;text-shadow:0 0 20px rgba(0,207,255,0.5)}
-#logo span{color:#fff;font-size:10px;font-weight:400;display:block;letter-spacing:2px;opacity:0.5}
-#live-badge{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:2px;color:#ff4444}
-#live-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;animation:pulse 1.2s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(1.4)}}
-#activity{font-size:11px;color:#00cfff;letter-spacing:1px;text-align:right}
-#activity b{font-size:18px;color:#fff;display:block}
-#categories{display:flex;gap:6px;padding:8px 16px;background:rgba(5,10,20,0.95);border-bottom:1px solid rgba(0,180,255,0.1);overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+:root{--red:#ff3b3b;--purple:#9b59ff;--green:#00e87a;--blue:#00b4ff;--orange:#ff8c00;--cyan:#00cfff;--yellow:#ffd700}
+body{font-family:-apple-system,'SF Pro Display',sans-serif;background:#000;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* HEADER */
+#header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(0,0,0,0.85);z-index:100;flex-shrink:0;backdrop-filter:blur(10px)}
+#logo-wrap{display:flex;align-items:center;gap:8px}
+#logo-icon{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:16px}
+#logo-text{font-size:17px;font-weight:700;letter-spacing:2px;color:#fff}
+#logo-sub{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1px;display:block}
+#live-pill{background:rgba(255,59,59,0.15);border:1px solid rgba(255,59,59,0.4);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#ff3b3b;letter-spacing:1px}
+#live-dot{width:7px;height:7px;background:#ff3b3b;border-radius:50%;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+#header-icons{display:flex;gap:16px;align-items:center}
+#header-icons span{font-size:20px;cursor:pointer;opacity:0.7}
+
+/* HERO */
+#hero{position:relative;flex-shrink:0;background:#000;overflow:hidden}
+#globe-bg{width:100%;height:240px;object-fit:cover;opacity:0.85;display:block}
+#globe-canvas{position:absolute;top:0;left:0;width:100%;height:240px}
+#hero-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(0,0,0,0.8) 30%,transparent 70%)}
+#hero-text{position:absolute;top:20px;left:16px}
+#hero-title1{font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1}
+#hero-title2{font-size:28px;font-weight:800;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+#hero-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;letter-spacing:0.5px}
+#activity-box{position:absolute;top:16px;right:16px;text-align:right}
+#act-label{font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:1px}
+#act-count{font-size:26px;font-weight:800;color:#fff;display:block;line-height:1}
+#act-change{font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px;justify-content:flex-end;margin-top:2px}
+
+/* MAP AREA */
+#map-section{position:relative;height:240px;flex-shrink:0}
+#map{width:100%;height:100%}
+.leaflet-tile-pane{filter:brightness(0.25) saturate(0.1) hue-rotate(210deg)}
+.leaflet-container{background:#000510}
+
+/* CATEGORIES */
+#categories{display:flex;flex-direction:row;overflow-x:auto;gap:8px;padding:10px 16px;background:#000;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;scrollbar-width:none}
 #categories::-webkit-scrollbar{display:none}
-.cat-btn{padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:10px;letter-spacing:1px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit}
-.cat-btn.active,.cat-btn:hover{color:#fff}
-.cat-btn[data-cat="all"].active{background:rgba(0,207,255,0.2);border-color:#00cfff;color:#00cfff}
-.cat-btn[data-cat="world"].active{background:rgba(255,68,68,0.2);border-color:#ff4444;color:#ff4444}
-.cat-btn[data-cat="business"].active{background:rgba(0,255,136,0.2);border-color:#00ff88;color:#00ff88}
-.cat-btn[data-cat="technology"].active{background:rgba(170,68,255,0.2);border-color:#aa44ff;color:#aa44ff}
-.cat-btn[data-cat="health"].active{background:rgba(255,68,170,0.2);border-color:#ff44aa;color:#ff44aa}
-.cat-btn[data-cat="science"].active{background:rgba(255,136,0,0.2);border-color:#ff8800;color:#ff8800}
-.cat-btn[data-cat="sports"].active{background:rgba(255,221,0,0.2);border-color:#ffdd00;color:#ffdd00}
-#main{display:flex;flex:1;overflow:hidden}
-#map{flex:1;position:relative;z-index:1}
-.leaflet-tile-pane{filter:brightness(0.35) saturate(0.2) hue-rotate(200deg)}
-.leaflet-container{background:#020508}
-#sidebar{width:300px;background:rgba(3,8,18,0.98);border-left:1px solid rgba(0,180,255,0.12);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
-#sidebar-header{padding:10px 14px;border-bottom:1px solid rgba(0,180,255,0.1);font-size:10px;letter-spacing:2px;color:rgba(0,207,255,0.7);display:flex;align-items:center;gap:6px}
-#sidebar-header::before{content:'';width:6px;height:6px;background:#ff4444;border-radius:50%;animation:pulse 1.2s infinite}
-#news-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,180,255,0.2) transparent}
-.news-item{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.2s;border-left:3px solid transparent}
-.news-item:hover{background:rgba(0,207,255,0.04)}
-.news-item.active{background:rgba(0,207,255,0.07);border-left-color:#00cfff}
-.news-item.cat-world{border-left-color:rgba(255,68,68,0.4)}
-.news-item.cat-world.active{border-left-color:#ff4444;background:rgba(255,68,68,0.07)}
-.news-item.cat-business{border-left-color:rgba(0,255,136,0.4)}
-.news-item.cat-business.active{border-left-color:#00ff88;background:rgba(0,255,136,0.07)}
-.news-item.cat-technology{border-left-color:rgba(170,68,255,0.4)}
-.news-item.cat-technology.active{border-left-color:#aa44ff;background:rgba(170,68,255,0.07)}
-.news-item.cat-health{border-left-color:rgba(255,68,170,0.4)}
-.news-item.cat-science{border-left-color:rgba(255,136,0,0.4)}
-.news-item.cat-sports{border-left-color:rgba(255,221,0,0.4)}
-.news-time{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-bottom:3px}
-.news-title{font-size:12px;color:#d0e8ff;line-height:1.4;margin-bottom:5px}
-.news-source{font-size:10px;display:flex;align-items:center;gap:5px}
-.src-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-.news-img{width:100%;height:75px;object-fit:cover;border-radius:3px;margin-bottom:6px;opacity:0.75}
-#markets{display:flex;border-top:1px solid rgba(0,180,255,0.12);flex-shrink:0}
-.market-item{flex:1;padding:8px 6px;border-right:1px solid rgba(0,180,255,0.08);text-align:center}
-.market-item:last-child{border-right:none}
-.market-name{font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1px}
-.market-price{font-size:13px;font-weight:700;color:#fff;margin:2px 0}
-.market-change{font-size:9px}
-.up{color:#00ff88}.down{color:#ff4444}
-.custom-marker{width:12px;height:12px;border-radius:50%;border:2px solid;cursor:pointer}
-.pulse-ring{width:28px;height:28px;border-radius:50%;border:1px solid;position:absolute;top:-8px;left:-8px;animation:ringPulse 2s infinite}
-@keyframes ringPulse{0%{opacity:0.8;transform:scale(0.5)}100%{opacity:0;transform:scale(1.8)}}
-.leaflet-popup-content-wrapper{background:rgba(3,10,25,0.98);border:1px solid rgba(0,207,255,0.25);border-radius:6px;color:#e0f0ff;font-family:'Courier New',monospace;box-shadow:0 4px 30px rgba(0,0,0,0.9)}
-.leaflet-popup-tip{background:rgba(3,10,25,0.98)}
-.leaflet-popup-content{margin:10px 14px;font-size:12px;line-height:1.5;min-width:200px}
-.popup-title{font-weight:700;font-size:12px;margin-bottom:5px;color:#e0f0ff}
-.popup-meta{font-size:10px;color:rgba(0,207,255,0.6);margin-bottom:5px}
-.popup-link{font-size:10px;color:#00cfff;text-decoration:none}
-.leaflet-control-zoom a{background:rgba(3,10,25,0.9)!important;border-color:rgba(0,207,255,0.2)!important;color:#00cfff!important}
-#loading-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(2,5,12,0.96);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px}
-#loading-text{font-size:12px;color:#00cfff;letter-spacing:3px;animation:pulse 1.5s infinite}
-.spinner{width:36px;height:36px;border:2px solid rgba(0,207,255,0.15);border-top-color:#00cfff;border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.cat-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit;flex-shrink:0}
+.cat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cat-btn.active,.cat-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.25);color:#fff}
+
+/* NEWS LIST */
+#news-section{flex:1;overflow:hidden;display:flex;flex-direction:column;background:#000}
+#news-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0}
+#news-header-left{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:1px}
+#news-dot{width:7px;height:7px;background:#ff3b3b;border-radius:50%;animation:blink 1s infinite}
+#ver-todas{font-size:11px;color:var(--cyan);opacity:0.8}
+#news-list{flex:1;overflow-y:auto;scrollbar-width:none}
+#news-list::-webkit-scrollbar{display:none}
+.news-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.15s}
+.news-item:hover,.news-item.active{background:rgba(255,255,255,0.04)}
+.news-thumb{width:64px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,0.08)}
+.news-thumb-icon{width:64px;height:48px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+.news-body{flex:1;min-width:0}
+.news-meta{font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.news-urgent{color:#ff3b3b;font-weight:700;font-size:9px;letter-spacing:1px}
+.news-title{font-size:13px;font-weight:500;color:#eee;line-height:1.35;margin-bottom:3px}
+.news-time{font-size:10px;color:rgba(255,255,255,0.3)}
+.news-arrow{font-size:14px;color:rgba(255,255,255,0.2);flex-shrink:0}
+.news-country{font-size:10px;color:rgba(255,255,255,0.3);flex-shrink:0;min-width:50px;text-align:right}
+
+/* MARKETS */
+#markets-section{background:#000;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;padding:10px 16px}
+#markets-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+#markets-title{font-size:11px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.6)}
+#markets-ver{font-size:11px;color:var(--cyan);opacity:0.7}
+#markets-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+#markets-row::-webkit-scrollbar{display:none}
+.market-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 12px;flex-shrink:0;min-width:90px}
+.market-icon{font-size:14px;margin-bottom:2px}
+.market-name{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.5px}
+.market-price{font-size:14px;font-weight:700;color:#fff;margin:2px 0}
+.market-change{font-size:10px;font-weight:600}
+.up{color:var(--green)}.down{color:var(--red)}
+.spark{height:20px;display:flex;align-items:flex-end;gap:1px;margin-top:3px}
+.spark-bar{width:3px;border-radius:1px;background:var(--green);opacity:0.6}
+
+/* BOTTOM NAV */
+#bottom-nav{display:flex;background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;cursor:pointer;opacity:0.4;transition:opacity 0.2s}
+.nav-item.active{opacity:1}
+.nav-icon{font-size:20px;margin-bottom:2px}
+.nav-label{font-size:9px;letter-spacing:0.5px}
+#nav-center{width:52px;height:52px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin-top:-12px;box-shadow:0 0 20px rgba(0,180,255,0.4)}
+
+/* POPUPS */
+.leaflet-popup-content-wrapper{background:rgba(5,5,20,0.95);border:1px solid rgba(0,180,255,0.2);border-radius:10px;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.8);backdrop-filter:blur(10px)}
+.leaflet-popup-tip{background:rgba(5,5,20,0.95)}
+.leaflet-popup-content{margin:10px 14px;font-size:12px;line-height:1.5;min-width:160px}
+.popup-loc{font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:3px}
+.popup-title{font-size:12px;color:#eee;margin-bottom:4px;line-height:1.3}
+.popup-time{font-size:10px;color:rgba(255,255,255,0.35)}
+.leaflet-control-zoom a{background:rgba(0,0,0,0.8)!important;border-color:rgba(255,255,255,0.1)!important;color:#fff!important;border-radius:6px!important}
 </style>
 </head>
 <body>
+
+<!-- HEADER -->
 <div id="header">
-  <div id="logo">ORVEX<span>SEE THE WORLD FIRST</span></div>
-  <div id="live-badge"><div id="live-dot"></div>EN VIVO</div>
-  <div id="activity">ACTIVIDAD GLOBAL<b id="act-count">—</b></div>
+  <div id="logo-wrap">
+    <div id="logo-icon">🌐</div>
+    <div>
+      <div id="logo-text">ORVEX</div>
+      <span id="logo-sub">SEE THE WORLD FIRST</span>
+    </div>
+  </div>
+  <div id="live-pill"><div id="live-dot"></div>EN VIVO</div>
+  <div id="header-icons">
+    <span>🔔</span>
+    <span>☰</span>
+  </div>
 </div>
+
+<!-- HERO -->
+<div id="hero">
+  <canvas id="globe-canvas"></canvas>
+  <div id="hero-overlay"></div>
+  <div id="hero-text">
+    <div id="hero-title1">EL MUNDO</div>
+    <div id="hero-title2">EN TIEMPO REAL</div>
+    <div id="hero-sub">Explora. Entiende. Anticípate.</div>
+  </div>
+  <div id="activity-box">
+    <div id="act-label">ACTIVIDAD GLOBAL</div>
+    <b id="act-count">—</b>
+    <div id="act-change">▲ 18.6% últimas 24h</div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="map-section">
+  <div id="map"></div>
+</div>
+
+<!-- CATEGORIES -->
 <div id="categories">
-  <button class="cat-btn active" data-cat="all">TODOS</button>
-  <button class="cat-btn" data-cat="world">MUNDO</button>
-  <button class="cat-btn" data-cat="business">ECONOMIA</button>
-  <button class="cat-btn" data-cat="technology">TECNOLOGIA</button>
-  <button class="cat-btn" data-cat="health">SALUD</button>
-  <button class="cat-btn" data-cat="science">CIENCIA</button>
-  <button class="cat-btn" data-cat="sports">DEPORTES</button>
+  <button class="cat-btn active" data-cat="all"><span class="cat-dot" style="background:#fff"></span>Todos</button>
+  <button class="cat-btn" data-cat="world"><span class="cat-dot" style="background:#ff3b3b"></span>Conflictos</button>
+  <button class="cat-btn" data-cat="business"><span class="cat-dot" style="background:#00e87a"></span>Economía</button>
+  <button class="cat-btn" data-cat="technology"><span class="cat-dot" style="background:#00b4ff"></span>Tecnología</button>
+  <button class="cat-btn" data-cat="health"><span class="cat-dot" style="background:#9b59ff"></span>Salud</button>
+  <button class="cat-btn" data-cat="science"><span class="cat-dot" style="background:#ff8c00"></span>Ciencia</button>
+  <button class="cat-btn" data-cat="sports"><span class="cat-dot" style="background:#ffd700"></span>Deportes</button>
 </div>
-<div id="main">
-  <div id="map">
-    <div id="loading-overlay">
-      <div class="spinner"></div>
-      <div id="loading-text">CONECTANDO FUENTES GLOBALES...</div>
+
+<!-- NEWS -->
+<div id="news-section">
+  <div id="news-header">
+    <div id="news-header-left"><div id="news-dot"></div>EN DIRECTO</div>
+    <div id="ver-todas">Ver todas</div>
+  </div>
+  <div id="news-list"></div>
+</div>
+
+<!-- MARKETS -->
+<div id="markets-section">
+  <div id="markets-header">
+    <div id="markets-title">MERCADOS EN VIVO</div>
+    <div id="markets-ver">Ver todas</div>
+  </div>
+  <div id="markets-row">
+    <div class="market-card">
+      <div class="market-icon">₿</div>
+      <div class="market-name">BTC / USD</div>
+      <div class="market-price" id="m-btc">63,245</div>
+      <div class="market-change up" id="m-btc-c">+2.35%</div>
+      <div class="spark" id="spark-btc"></div>
+    </div>
+    <div class="market-card">
+      <div class="market-icon">🛢</div>
+      <div class="market-name">PETRÓLEO</div>
+      <div class="market-price" id="m-oil">82.45</div>
+      <div class="market-change down" id="m-oil-c">-1.42%</div>
+      <div class="spark" id="spark-oil"></div>
+    </div>
+    <div class="market-card">
+      <div class="market-icon">🥇</div>
+      <div class="market-name">ORO</div>
+      <div class="market-price" id="m-gold">2,338</div>
+      <div class="market-change up" id="m-gold-c">+0.71%</div>
+      <div class="spark" id="spark-gold"></div>
+    </div>
+    <div class="market-card">
+      <div class="market-icon">📈</div>
+      <div class="market-name">S&P 500</div>
+      <div class="market-price" id="m-sp">5,072</div>
+      <div class="market-change down" id="m-sp-c">-0.28%</div>
+      <div class="spark" id="spark-sp"></div>
     </div>
   </div>
-  <div id="sidebar">
-    <div id="sidebar-header">EN DIRECTO</div>
-    <div id="news-list"></div>
-    <div id="markets">
-      <div class="market-item"><div class="market-name">BTC</div><div class="market-price" id="m-btc">—</div><div class="market-change up" id="m-btc-c">—</div></div>
-      <div class="market-item"><div class="market-name">ORO</div><div class="market-price" id="m-gold">—</div><div class="market-change up" id="m-gold-c">—</div></div>
-      <div class="market-item"><div class="market-name">S&P500</div><div class="market-price" id="m-sp">—</div><div class="market-change down" id="m-sp-c">—</div></div>
-    </div>
-  </div>
 </div>
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <div class="nav-item active"><div class="nav-icon">🌍</div><div class="nav-label">Mapa</div></div>
+  <div class="nav-item"><div class="nav-icon">📈</div><div class="nav-label">Tendencias</div></div>
+  <div class="nav-item" style="flex:0.8"><div id="nav-center">🎯</div></div>
+  <div class="nav-item"><div class="nav-icon">🔔</div><div class="nav-label">Alertas</div></div>
+  <div class="nav-item"><div class="nav-icon">🔖</div><div class="nav-label">Guardados</div></div>
+</div>
+
 <script>
-const catColors={all:'#00cfff',world:'#ff4444',business:'#00ff88',technology:'#aa44ff',health:'#ff44aa',science:'#ff8800',sports:'#ffdd00'};
+const catColors={all:'#ffffff',world:'#ff3b3b',business:'#00e87a',technology:'#00b4ff',health:'#9b59ff',science:'#ff8c00',sports:'#ffd700'};
+const catIcons={world:'💥',business:'📊',technology:'💻',health:'🏥',science:'🔬',sports:'⚽'};
+
+const countryCoords={
+  us:{name:'EE. UU.',lat:37.09,lng:-95.71},
+  gb:{name:'Reino Unido',lat:55.37,lng:-3.43},
+  de:{name:'Alemania',lat:51.16,lng:10.45},
+  fr:{name:'Francia',lat:46.22,lng:2.21},
+  jp:{name:'Japón',lat:36.20,lng:138.25},
+  cn:{name:'China',lat:35.86,lng:104.19},
+  in:{name:'India',lat:20.59,lng:78.96},
+  br:{name:'Brasil',lat:-14.23,lng:-51.92},
+  ru:{name:'Rusia',lat:61.52,lng:105.31},
+  au:{name:'Australia',lat:-25.27,lng:133.77},
+  mx:{name:'México',lat:23.63,lng:-102.55},
+  es:{name:'España',lat:40.46,lng:-3.74},
+  ar:{name:'Argentina',lat:-38.41,lng:-63.61},
+  pe:{name:'Perú',lat:-9.19,lng:-75.01},
+  za:{name:'Sudáfrica',lat:-30.55,lng:22.93},
+  ng:{name:'Nigeria',lat:9.08,lng:8.67},
+  eg:{name:'Egipto',lat:26.82,lng:30.80},
+  kr:{name:'Corea del Sur',lat:35.90,lng:127.76},
+  ae:{name:'Emiratos',lat:23.42,lng:53.84},
+  ua:{name:'Ucrania',lat:48.37,lng:31.16},
+  ir:{name:'Irán',lat:32.42,lng:53.68},
+};
+
+const fallbackNews=[
+  {title:'Explosiones reportadas en el centro de la ciudad',source:'Reuters',cat:'world',country:'ua',time:'Hace 2 min',urgent:true},
+  {title:'Tensión militar elevada en la región',source:'Al Jazeera',cat:'world',country:'ir',time:'Hace 15 min'},
+  {title:'Caída del mercado bursátil en Asia',source:'Bloomberg',cat:'business',country:'jp',time:'Hace 7 min'},
+  {title:'Protestas masivas en avenida principal',source:'BBC',cat:'world',country:'br',time:'Hace 32 min'},
+  {title:'La oposición lidera los primeros resultados',source:'CNN',cat:'world',country:'za',time:'Hace 11 min'},
+  {title:'Empresa lanza nuevo modelo de inteligencia artificial',source:'TechCrunch',cat:'technology',country:'us',time:'Hace 14 min'},
+  {title:'Nuevo tratamiento contra el cáncer logra resultados históricos',source:'Lancet',cat:'health',country:'gb',time:'Hace 28 min'},
+  {title:'Acuerdo comercial firmado entre bloques económicos',source:'FT',cat:'business',country:'de',time:'Hace 41 min'},
+  {title:'SpaceX lanza misión tripulada a la estación espacial',source:'Space.com',cat:'science',country:'us',time:'Hace 55 min'},
+  {title:'Champions League: resultados y clasificados a cuartos',source:'ESPN',cat:'sports',country:'es',time:'Hace 1h 2min'},
+  {title:'Terremoto de magnitud 5.8 sacude la costa del Pacífico',source:'USGS',cat:'world',country:'pe',time:'Hace 1h 20min'},
+  {title:'Bitcoin supera nuevo récord histórico en mercados globales',source:'CoinDesk',cat:'business',country:'us',time:'Hace 1h 35min'},
+];
 
 const RSS_FEEDS=[
   {url:'https://feeds.bbci.co.uk/news/world/rss.xml',source:'BBC World',cat:'world',country:'gb'},
@@ -118,167 +260,111 @@ const RSS_FEEDS=[
   {url:'https://feeds.bbci.co.uk/news/health/rss.xml',source:'BBC Health',cat:'health',country:'gb'},
   {url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',source:'BBC Science',cat:'science',country:'gb'},
   {url:'https://feeds.bbci.co.uk/sport/rss.xml',source:'BBC Sport',cat:'sports',country:'gb'},
-  {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',source:'NY Times',cat:'world',country:'us'},
-  {url:'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',source:'NY Times Tech',cat:'technology',country:'us'},
-  {url:'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml',source:'NY Times Biz',cat:'business',country:'us'},
 ];
 
-const countryCoords={
-  us:{name:'Estados Unidos',lat:37.09,lng:-95.71},
-  gb:{name:'Reino Unido',lat:55.37,lng:-3.43},
-  de:{name:'Alemania',lat:51.16,lng:10.45},
-  fr:{name:'Francia',lat:46.22,lng:2.21},
-  jp:{name:'Japon',lat:36.20,lng:138.25},
-  cn:{name:'China',lat:35.86,lng:104.19},
-  in:{name:'India',lat:20.59,lng:78.96},
-  br:{name:'Brasil',lat:-14.23,lng:-51.92},
-  ru:{name:'Rusia',lat:61.52,lng:105.31},
-  au:{name:'Australia',lat:-25.27,lng:133.77},
-  mx:{name:'Mexico',lat:23.63,lng:-102.55},
-  es:{name:'Espana',lat:40.46,lng:-3.74},
-  ar:{name:'Argentina',lat:-38.41,lng:-63.61},
-  pe:{name:'Peru',lat:-9.19,lng:-75.01},
-  co:{name:'Colombia',lat:4.57,lng:-74.29},
-  za:{name:'Sudafrica',lat:-30.55,lng:22.93},
-  ng:{name:'Nigeria',lat:9.08,lng:8.67},
-  eg:{name:'Egipto',lat:26.82,lng:30.80},
-  kr:{name:'Corea del Sur',lat:35.90,lng:127.76},
-  ae:{name:'Emiratos',lat:23.42,lng:53.84},
-};
-
-const fallbackNews=[
-  {title:'Cumbre internacional sobre cambio climático reúne a líderes mundiales',source:'Reuters',cat:'world',country:'us',time:'Hace 5 min',url:'#'},
-  {title:'Mercados globales suben ante datos positivos de inflación',source:'Bloomberg',cat:'business',country:'us',time:'Hace 12 min',url:'#'},
-  {title:'OpenAI lanza nuevo modelo de inteligencia artificial',source:'TechCrunch',cat:'technology',country:'us',time:'Hace 18 min',url:'#'},
-  {title:'OMS alerta sobre nuevo brote de enfermedad en Asia',source:'BBC Health',cat:'health',country:'gb',time:'Hace 25 min',url:'#'},
-  {title:'Descubrimiento arqueológico revela nueva civilización antigua',source:'Nat Geo',cat:'science',country:'eg',time:'Hace 31 min',url:'#'},
-  {title:'Champions League: resultados de los partidos de hoy',source:'ESPN',cat:'sports',country:'es',time:'Hace 40 min',url:'#'},
-  {title:'Tensiones diplomáticas entre potencias mundiales',source:'Al Jazeera',cat:'world',country:'ae',time:'Hace 48 min',url:'#'},
-  {title:'Bitcoin supera nuevo máximo histórico en mercados',source:'CoinDesk',cat:'business',country:'us',time:'Hace 55 min',url:'#'},
-  {title:'SpaceX lanza nueva misión al espacio con éxito',source:'Space.com',cat:'science',country:'us',time:'Hace 1h',url:'#'},
-  {title:'Elecciones en América Latina marcan nueva tendencia política',source:'CNN',cat:'world',country:'br',time:'Hace 1h 10min',url:'#'},
-  {title:'Acuerdo comercial entre Asia y Europa entra en vigor',source:'FT',country:'jp',cat:'business',time:'Hace 1h 20min',url:'#'},
-  {title:'Meta anuncia nuevas funciones de realidad aumentada',source:'Wired',cat:'technology',country:'us',time:'Hace 1h 35min',url:'#'},
-  {title:'Crisis humanitaria en África requiere ayuda urgente',source:'BBC',cat:'world',country:'ng',time:'Hace 1h 50min',url:'#'},
-  {title:'Nuevo tratamiento contra el cáncer logra resultados prometedores',source:'Lancet',cat:'health',country:'gb',time:'Hace 2h',url:'#'},
-  {title:'Copa del Mundo: equipos clasificados a cuartos de final',source:'FIFA',cat:'sports',country:'fr',time:'Hace 2h 15min',url:'#'},
-];
-
-let map,markers=[],allNews=[],activeFilter='all';
+let map,markers=[],allNews=fallbackNews,activeFilter='all';
 
 function initMap(){
-  map=L.map('map',{zoomControl:true,attributionControl:false}).setView([20,10],2);
+  map=L.map('map',{zoomControl:true,attributionControl:false,dragging:true}).setView([25,15],2);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
 }
 
-function jitter(lat,lng){return[lat+(Math.random()-0.5)*5,lng+(Math.random()-0.5)*5];}
-
-function getCoords(country){
-  const c=countryCoords[country]||Object.values(countryCoords)[Math.floor(Math.random()*Object.keys(countryCoords).length)];
-  return jitter(c.lat,c.lng);
-}
-
-function getCountryName(code){
-  return (countryCoords[code]||{name:'Mundial'}).name;
-}
-
-async function fetchRSS(feed){
-  try{
-    const proxy='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(feed.url);
-    const res=await fetch(proxy);
-    const data=await res.json();
-    if(data.status==='ok'&&data.items){
-      return data.items.slice(0,5).map(item=>({
-        title:item.title,
-        source:feed.source,
-        cat:feed.cat,
-        country:feed.country,
-        url:item.link||'#',
-        image:item.thumbnail||item.enclosure?.link||null,
-        time:item.pubDate?timeAgo(item.pubDate):'Reciente',
-      }));
+function drawGlobe(){
+  const canvas=document.getElementById('globe-canvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth*2;
+  canvas.height=canvas.offsetHeight*2;
+  ctx.scale(2,2);
+  const w=canvas.offsetWidth,h=canvas.offsetHeight;
+  ctx.clearRect(0,0,w,h);
+  const cx=w*0.62,cy=h*0.5,r=h*0.48;
+  const grad=ctx.createRadialGradient(cx,cy,r*0.1,cx,cy,r);
+  grad.addColorStop(0,'rgba(0,60,120,0.6)');
+  grad.addColorStop(0.5,'rgba(0,20,60,0.4)');
+  grad.addColorStop(1,'rgba(0,0,20,0)');
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+  for(let i=0;i<80;i++){
+    const angle=Math.random()*Math.PI*2;
+    const dist=Math.random()*r;
+    const x=cx+Math.cos(angle)*dist;
+    const y=cy+Math.sin(angle)*dist;
+    if(Math.sqrt((x-cx)**2+(y-cy)**2)>r)continue;
+    const brightness=Math.random();
+    const colors=['#ff3b3b','#9b59ff','#00e87a','#ff8c00','#00b4ff','#ffd700'];
+    const color=colors[Math.floor(Math.random()*colors.length)];
+    ctx.beginPath();ctx.arc(x,y,brightness*2+0.5,0,Math.PI*2);
+    ctx.fillStyle=color;ctx.globalAlpha=0.6+Math.random()*0.4;ctx.fill();
+    if(brightness>0.7){
+      ctx.beginPath();ctx.arc(x,y,4+Math.random()*6,0,Math.PI*2);
+      ctx.fillStyle=color;ctx.globalAlpha=0.1;ctx.fill();
     }
-  }catch(e){}
-  return[];
+  }
+  ctx.globalAlpha=1;
 }
 
-async function loadAllNews(){
-  document.getElementById('loading-overlay').style.display='flex';
-  document.getElementById('loading-text').textContent='CONECTANDO FUENTES GLOBALES...';
-  
+function jitter(lat,lng){return[lat+(Math.random()-0.5)*6,lng+(Math.random()-0.5)*6];}
+function getCoords(c){const d=countryCoords[c]||countryCoords.us;return jitter(d.lat,d.lng);}
+function getCountryName(c){return(countryCoords[c]||{name:'Mundial'}).name;}
+
+async function fetchRSS(){
   try{
-    const results=await Promise.allSettled(RSS_FEEDS.map(f=>fetchRSS(f)));
+    const results=await Promise.allSettled(RSS_FEEDS.map(async f=>{
+      const proxy='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(f.url);
+      const res=await fetch(proxy);const data=await res.json();
+      if(data.status==='ok'&&data.items){
+        return data.items.slice(0,4).map(item=>({
+          title:item.title,source:f.source,cat:f.cat,country:f.country,
+          url:item.link||'#',image:item.thumbnail||null,time:timeAgo(item.pubDate),
+        }));
+      }return[];
+    }));
     const fetched=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
-    allNews=fetched.length>3?fetched:fallbackNews;
-  }catch(e){
-    allNews=fallbackNews;
-  }
-  
+    if(fetched.length>3)allNews=fetched;
+  }catch(e){}
   document.getElementById('act-count').textContent=(allNews.length*471).toLocaleString();
-  document.getElementById('loading-overlay').style.display='none';
   renderAll();
 }
 
-function timeAgo(dateStr){
-  try{
-    const diff=Date.now()-new Date(dateStr).getTime();
-    const mins=Math.floor(diff/60000);
-    if(mins<1)return'Ahora mismo';
-    if(mins<60)return'Hace '+mins+' min';
-    const hrs=Math.floor(mins/60);
-    if(hrs<24)return'Hace '+hrs+'h';
-    return'Hace '+Math.floor(hrs/24)+'d';
-  }catch(e){return'Reciente';}
+function timeAgo(d){
+  try{const diff=Date.now()-new Date(d).getTime(),mins=Math.floor(diff/60000);
+  if(mins<1)return'Ahora';if(mins<60)return'Hace '+mins+' min';
+  const h=Math.floor(mins/60);if(h<24)return'Hace '+h+'h';return'Hace '+Math.floor(h/24)+'d';}
+  catch(e){return'Reciente';}
 }
 
 function renderAll(){
-  markers.forEach(m=>map.removeLayer(m));
-  markers=[];
-  const list=document.getElementById('news-list');
-  list.innerHTML='';
-  
+  markers.forEach(m=>map.removeLayer(m));markers=[];
+  const list=document.getElementById('news-list');list.innerHTML='';
   const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
-  const color=catColors[activeFilter]||'#00cfff';
-  
+
   filtered.forEach((n,i)=>{
+    const color=catColors[n.cat]||'#fff';
     const coords=getCoords(n.country);
-    const nColor=catColors[n.cat]||color;
-    
-    const markerHtml=`<div style="position:relative;width:28px;height:28px;">
-      <div class="pulse-ring" style="border-color:${nColor};opacity:0.4;animation-delay:${i*0.2}s"></div>
-      <div class="custom-marker" style="background:${nColor};border-color:${nColor};box-shadow:0 0 8px ${nColor};position:absolute;top:8px;left:8px;"></div>
+    const markerHtml=`<div style="position:relative;width:32px;height:32px;">
+      <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-radius:50%;border:1.5px solid ${color};opacity:0.3;animation:ringPulse ${1.5+Math.random()}s ${i*0.15}s infinite ease-out;"></div>
+      <div style="position:absolute;top:9px;left:9px;width:14px;height:14px;border-radius:50%;background:${color};box-shadow:0 0 10px ${color},0 0 20px ${color}44;border:2px solid #fff;"></div>
     </div>`;
-    
-    const m=L.marker([coords[0],coords[1]],{
-      icon:L.divIcon({className:'',html:markerHtml,iconSize:[28,28],iconAnchor:[14,14]})
-    }).addTo(map);
-    
-    m.bindPopup(
-      '<div class="popup-title">'+n.title.slice(0,90)+(n.title.length>90?'...':'')+'</div>'+
-      '<div class="popup-meta" style="color:'+nColor+'">'+n.source+' · '+getCountryName(n.country)+'</div>'+
-      (n.url&&n.url!=='#'?'<a href="'+n.url+'" class="popup-link" target="_blank">Leer articulo →</a>':'')
-    );
+    const m=L.marker([coords[0],coords[1]],{icon:L.divIcon({className:'',html:markerHtml,iconSize:[32,32],iconAnchor:[16,16]})}).addTo(map);
+    m.bindPopup(`<div class="popup-loc">${getCountryName(n.country)}</div><div class="popup-title">${n.title.slice(0,70)}${n.title.length>70?'...':''}</div><div class="popup-time">${n.source} · ${n.time}</div>`);
     m.on('click',()=>highlightNews(i));
     markers.push(m);
-    
+
     const item=document.createElement('div');
-    item.className='news-item cat-'+n.cat;
-    item.id='news-'+i;
-    item.onclick=(()=>{
-      const idx=i,lat=coords[0],lng=coords[1];
-      return()=>{map.setView([lat,lng],5,{animate:true});markers[idx]&&markers[idx].openPopup();highlightNews(idx);};
-    })();
-    item.innerHTML=
-      (n.image?'<img class="news-img" src="'+n.image+'" onerror="this.style.display=\'none\'" alt=""/>':'')+
-      '<div class="news-time">'+n.time+' · '+getCountryName(n.country)+'</div>'+
-      '<div class="news-title">'+n.title.slice(0,95)+(n.title.length>95?'...':'')+'</div>'+
-      '<div class="news-source"><span class="src-dot" style="background:'+nColor+'"></span><span style="color:'+nColor+'">'+n.source+'</span></div>';
+    item.className='news-item';item.id='news-'+i;
+    item.onclick=(()=>{const idx=i,la=coords[0],ln=coords[1];return()=>{map.setView([la,ln],5,{animate:true});markers[idx]&&markers[idx].openPopup();highlightNews(idx);};})();
+    const thumb=n.image
+      ?`<img class="news-thumb" src="${n.image}" onerror="this.style.display='none'" alt=""/>`
+      :`<div class="news-thumb-icon" style="background:${color}22">${catIcons[n.cat]||'📰'}</div>`;
+    item.innerHTML=thumb+
+      `<div class="news-body">
+        <div class="news-meta">${n.urgent?'<span class="news-urgent">URGENTE</span>':''}<span>${n.source}</span></div>
+        <div class="news-title">${n.title.slice(0,75)}${n.title.length>75?'...':''}</div>
+        <div class="news-time">${n.time}</div>
+      </div>
+      <div class="news-country">${getCountryName(n.country)}</div>
+      <div class="news-arrow">›</div>`;
     list.appendChild(item);
   });
-  
-  if(filtered.length===0){
-    list.innerHTML='<div style="padding:30px;font-size:12px;color:rgba(255,255,255,0.3);text-align:center">Sin noticias en esta categoría</div>';
-  }
 }
 
 function highlightNews(idx){
@@ -290,39 +376,60 @@ function highlightNews(idx){
 document.querySelectorAll('.cat-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter=btn.dataset.cat;
-    renderAll();
+    btn.classList.add('active');activeFilter=btn.dataset.cat;renderAll();
   });
 });
 
+function initSparklines(){
+  ['btc','oil','gold','sp'].forEach(id=>{
+    const el=document.getElementById('spark-'+id);
+    if(!el)return;
+    const isUp=id==='btc'||id==='gold';
+    for(let i=0;i<8;i++){
+      const bar=document.createElement('div');
+      bar.className='spark-bar';
+      bar.style.height=(8+Math.random()*12)+'px';
+      bar.style.background=isUp?'var(--green)':'var(--red)';
+      el.appendChild(bar);
+    }
+  });
+}
+
 function animateMarkets(){
   const m=[
-    {id:'m-btc',cid:'m-btc-c',base:63245,sym:'$'},
-    {id:'m-gold',cid:'m-gold-c',base:2338,sym:'$'},
-    {id:'m-sp',cid:'m-sp-c',base:5072,sym:'$'},
+    {id:'m-btc',cid:'m-btc-c',base:63245,sym:''},
+    {id:'m-oil',cid:'m-oil-c',base:82.45,sym:''},
+    {id:'m-gold',cid:'m-gold-c',base:2338,sym:''},
+    {id:'m-sp',cid:'m-sp-c',base:5072,sym:''},
   ];
-  m.forEach(mk=>{
-    document.getElementById(mk.id).textContent=mk.sym+Math.round(mk.base).toLocaleString();
-    document.getElementById(mk.cid).textContent='+0.00%';
-  });
   setInterval(()=>{
     m.forEach(mk=>{
-      const chg=(Math.random()-0.5)*0.4;
-      mk.base*=(1+chg/100);
-      const el=document.getElementById(mk.id);
-      const cel=document.getElementById(mk.cid);
-      if(el)el.textContent=mk.sym+Math.round(mk.base).toLocaleString();
+      const chg=(Math.random()-0.48)*0.3;mk.base*=(1+chg/100);
+      const el=document.getElementById(mk.id);const cel=document.getElementById(mk.cid);
+      if(el)el.textContent=mk.base>999?Math.round(mk.base).toLocaleString():mk.base.toFixed(2);
       if(cel){cel.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';cel.className='market-change '+(chg>=0?'up':'down');}
     });
-  },3500);
+  },3000);
 }
+
+function animateCount(){
+  let c=14021;
+  setInterval(()=>{c+=Math.floor(Math.random()*8-2);document.getElementById('act-count').textContent=c.toLocaleString();},2500);
+}
+
+const style=document.createElement('style');
+style.textContent='@keyframes ringPulse{0%{transform:scale(0.6);opacity:0.8}100%{transform:scale(2.2);opacity:0}}';
+document.head.appendChild(style);
 
 window.addEventListener('load',()=>{
   initMap();
+  drawGlobe();
+  initSparklines();
   animateMarkets();
-  loadAllNews();
-  setInterval(loadAllNews,300000);
+  animateCount();
+  renderAll();
+  fetchRSS();
+  setInterval(fetchRSS,300000);
 });
 </script>
 </body>
