@@ -12,96 +12,125 @@
 body{font-family:-apple-system,'SF Pro Display',sans-serif;background:#000;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
 /* HEADER */
-#header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(0,0,0,0.85);z-index:100;flex-shrink:0;backdrop-filter:blur(10px)}
-#logo-wrap{display:flex;align-items:center;gap:8px}
-#logo-icon{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:16px}
-#logo-text{font-size:17px;font-weight:700;letter-spacing:2px;color:#fff}
-#logo-sub{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1px;display:block}
-#live-pill{background:rgba(255,59,59,0.15);border:1px solid rgba(255,59,59,0.4);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#ff3b3b;letter-spacing:1px}
-#live-dot{width:7px;height:7px;background:#ff3b3b;border-radius:50%;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
-#header-icons{display:flex;gap:16px;align-items:center}
-#header-icons span{font-size:20px;cursor:pointer;opacity:0.7}
+#header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.9);z-index:200;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)}
+#logo-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+#logo-icon{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:15px}
+#logo-text{font-size:16px;font-weight:700;letter-spacing:2px}
+#logo-sub{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1px;display:block}
+#live-pill{background:rgba(255,59,59,0.12);border:1px solid rgba(255,59,59,0.35);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#ff3b3b;letter-spacing:1px}
+#live-dot{width:6px;height:6px;background:#ff3b3b;border-radius:50%;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.1}}
+#header-right{display:flex;gap:14px;align-items:center}
+#bell-btn,#menu-btn{font-size:20px;cursor:pointer;opacity:0.7;transition:opacity 0.2s;background:none;border:none;color:#fff}
+#bell-btn:hover,#menu-btn:hover{opacity:1}
+
+/* SLIDE MENU */
+#menu-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:500;display:none;backdrop-filter:blur(4px)}
+#menu-overlay.open{display:block}
+#side-menu{position:fixed;top:0;right:-280px;width:280px;height:100%;background:#0a0a0f;border-left:1px solid rgba(255,255,255,0.08);z-index:501;transition:right 0.3s ease;padding:20px 0;display:flex;flex-direction:column}
+#side-menu.open{right:0}
+#menu-header{padding:10px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:10px}
+#menu-logo{font-size:18px;font-weight:700;letter-spacing:3px;color:var(--cyan)}
+#menu-sub{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px}
+.menu-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:background 0.2s;font-size:14px;color:rgba(255,255,255,0.7)}
+.menu-item:hover{background:rgba(255,255,255,0.05);color:#fff}
+.menu-item-icon{font-size:18px;width:24px;text-align:center}
+.menu-divider{height:1px;background:rgba(255,255,255,0.06);margin:8px 0}
+#menu-close{position:absolute;top:14px;right:14px;font-size:20px;cursor:pointer;opacity:0.5;background:none;border:none;color:#fff}
+#menu-close:hover{opacity:1}
+#menu-version{padding:20px;font-size:10px;color:rgba(255,255,255,0.2);margin-top:auto}
 
 /* HERO */
-#hero{position:relative;flex-shrink:0;background:#000;overflow:hidden}
-#globe-bg{width:100%;height:240px;object-fit:cover;opacity:0.85;display:block}
-#globe-canvas{position:absolute;top:0;left:0;width:100%;height:240px}
-#hero-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(0,0,0,0.8) 30%,transparent 70%)}
-#hero-text{position:absolute;top:20px;left:16px}
-#hero-title1{font-size:28px;font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1}
-#hero-title2{font-size:28px;font-weight:800;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
-#hero-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:6px;letter-spacing:0.5px}
-#activity-box{position:absolute;top:16px;right:16px;text-align:right}
-#act-label{font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:1px}
-#act-count{font-size:26px;font-weight:800;color:#fff;display:block;line-height:1}
-#act-change{font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px;justify-content:flex-end;margin-top:2px}
+#hero{position:relative;flex-shrink:0;background:#000;overflow:hidden;height:130px}
+#hero-canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+#hero-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,rgba(0,0,0,0.85) 35%,rgba(0,0,0,0.2) 100%)}
+#hero-text{position:absolute;top:16px;left:16px}
+#hero-title1{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1}
+#hero-title2{font-size:24px;font-weight:800;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1}
+#hero-sub{font-size:10px;color:rgba(255,255,255,0.4);margin-top:5px;letter-spacing:0.5px}
+#activity-box{position:absolute;top:12px;right:14px;text-align:right}
+#act-label{font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:1px}
+#act-count{font-size:22px;font-weight:800;color:#fff;display:block;line-height:1}
+#act-change{font-size:9px;color:var(--green);display:flex;align-items:center;gap:2px;justify-content:flex-end;margin-top:1px}
 
-/* MAP AREA */
-#map-section{position:relative;height:240px;flex-shrink:0}
+/* GLOBE MAP - OVAL */
+#globe-section{position:relative;flex-shrink:0;display:flex;justify-content:center;align-items:center;background:#000510;padding:10px 0;height:180px}
+#globe-wrapper{position:relative;width:90%;height:160px;border-radius:50%;overflow:hidden;box-shadow:0 0 40px rgba(0,180,255,0.15),0 0 80px rgba(0,0,0,0.8);border:1px solid rgba(0,180,255,0.1)}
 #map{width:100%;height:100%}
-.leaflet-tile-pane{filter:brightness(0.25) saturate(0.1) hue-rotate(210deg)}
+.leaflet-tile-pane{filter:brightness(0.3) saturate(0.15) hue-rotate(210deg)}
 .leaflet-container{background:#000510}
+.leaflet-control-zoom{display:none}
 
 /* CATEGORIES */
-#categories{display:flex;flex-direction:row;overflow-x:auto;gap:8px;padding:10px 16px;background:#000;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;scrollbar-width:none}
+#categories{display:flex;overflow-x:auto;gap:6px;padding:8px 14px;background:#000;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;scrollbar-width:none}
 #categories::-webkit-scrollbar{display:none}
-.cat-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit;flex-shrink:0}
-.cat-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.cat-btn.active,.cat-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.25);color:#fff}
+.cat-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.45);font-size:11px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit;flex-shrink:0}
+.cat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.cat-btn.active{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.2);color:#fff}
 
-/* NEWS LIST */
+/* NEWS */
 #news-section{flex:1;overflow:hidden;display:flex;flex-direction:column;background:#000}
-#news-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;flex-shrink:0}
-#news-header-left{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:1px}
-#news-dot{width:7px;height:7px;background:#ff3b3b;border-radius:50%;animation:blink 1s infinite}
-#ver-todas{font-size:11px;color:var(--cyan);opacity:0.8}
+#news-header{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;flex-shrink:0}
+#news-header-left{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.8)}
+#news-dot{width:6px;height:6px;background:#ff3b3b;border-radius:50%;animation:blink 1s infinite}
+#ver-todas-btn{font-size:11px;color:var(--cyan);opacity:0.8;cursor:pointer;background:none;border:none;font-family:inherit}
 #news-list{flex:1;overflow-y:auto;scrollbar-width:none}
 #news-list::-webkit-scrollbar{display:none}
-.news-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.15s}
+.news-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.15s}
 .news-item:hover,.news-item.active{background:rgba(255,255,255,0.04)}
-.news-thumb{width:64px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,0.08)}
-.news-thumb-icon{width:64px;height:48px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+.news-thumb{width:60px;height:44px;border-radius:7px;object-fit:cover;flex-shrink:0}
+.news-thumb-icon{width:60px;height:44px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px}
 .news-body{flex:1;min-width:0}
-.news-meta{font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.news-top{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.news-source-tag{font-size:9px;color:rgba(255,255,255,0.35)}
 .news-urgent{color:#ff3b3b;font-weight:700;font-size:9px;letter-spacing:1px}
-.news-title{font-size:13px;font-weight:500;color:#eee;line-height:1.35;margin-bottom:3px}
-.news-time{font-size:10px;color:rgba(255,255,255,0.3)}
-.news-arrow{font-size:14px;color:rgba(255,255,255,0.2);flex-shrink:0}
-.news-country{font-size:10px;color:rgba(255,255,255,0.3);flex-shrink:0;min-width:50px;text-align:right}
+.news-title{font-size:12px;font-weight:500;color:#dde;line-height:1.35;margin-bottom:2px}
+.news-time{font-size:10px;color:rgba(255,255,255,0.25)}
+.news-country{font-size:9px;color:rgba(255,255,255,0.25);flex-shrink:0;min-width:45px;text-align:right;line-height:1.3}
+.news-arrow{font-size:16px;color:rgba(255,255,255,0.15);flex-shrink:0;margin-left:4px}
 
 /* MARKETS */
-#markets-section{background:#000;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;padding:10px 16px}
-#markets-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-#markets-title{font-size:11px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.6)}
-#markets-ver{font-size:11px;color:var(--cyan);opacity:0.7}
-#markets-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+#markets-section{background:#000;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding:8px 14px 10px}
+#markets-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+#markets-title{font-size:10px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.5)}
+#markets-ver{font-size:10px;color:var(--cyan);opacity:0.7;cursor:pointer}
+#markets-row{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none}
 #markets-row::-webkit-scrollbar{display:none}
-.market-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px 12px;flex-shrink:0;min-width:90px}
-.market-icon{font-size:14px;margin-bottom:2px}
-.market-name{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.5px}
-.market-price{font-size:14px;font-weight:700;color:#fff;margin:2px 0}
-.market-change{font-size:10px;font-weight:600}
+.market-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:7px 10px;flex-shrink:0;min-width:82px}
+.market-icon{font-size:12px;margin-bottom:1px}
+.market-name{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:0.5px}
+.market-price{font-size:13px;font-weight:700;color:#fff;margin:1px 0}
+.market-change{font-size:9px;font-weight:600}
 .up{color:var(--green)}.down{color:var(--red)}
-.spark{height:20px;display:flex;align-items:flex-end;gap:1px;margin-top:3px}
-.spark-bar{width:3px;border-radius:1px;background:var(--green);opacity:0.6}
+.spark{height:16px;display:flex;align-items:flex-end;gap:1px;margin-top:3px}
+.spark-bar{width:4px;border-radius:1px}
 
 /* BOTTOM NAV */
-#bottom-nav{display:flex;background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0;cursor:pointer;opacity:0.4;transition:opacity 0.2s}
+#bottom-nav{display:flex;background:#080808;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding:4px 0 6px}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px 0;cursor:pointer;opacity:0.35;transition:opacity 0.2s}
 .nav-item.active{opacity:1}
-.nav-icon{font-size:20px;margin-bottom:2px}
-.nav-label{font-size:9px;letter-spacing:0.5px}
-#nav-center{width:52px;height:52px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin-top:-12px;box-shadow:0 0 20px rgba(0,180,255,0.4)}
+.nav-icon{font-size:18px;margin-bottom:1px}
+.nav-label{font-size:8px;letter-spacing:0.5px;color:rgba(255,255,255,0.6)}
+#nav-center-wrap{flex:1;display:flex;justify-content:center;align-items:center;padding-bottom:2px}
+#nav-center{width:46px;height:46px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;margin-top:-10px;box-shadow:0 0 16px rgba(0,180,255,0.35)}
 
-/* POPUPS */
-.leaflet-popup-content-wrapper{background:rgba(5,5,20,0.95);border:1px solid rgba(0,180,255,0.2);border-radius:10px;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.8);backdrop-filter:blur(10px)}
-.leaflet-popup-tip{background:rgba(5,5,20,0.95)}
-.leaflet-popup-content{margin:10px 14px;font-size:12px;line-height:1.5;min-width:160px}
-.popup-loc{font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:3px}
-.popup-title{font-size:12px;color:#eee;margin-bottom:4px;line-height:1.3}
-.popup-time{font-size:10px;color:rgba(255,255,255,0.35)}
-.leaflet-control-zoom a{background:rgba(0,0,0,0.8)!important;border-color:rgba(255,255,255,0.1)!important;color:#fff!important;border-radius:6px!important}
+/* POPUP */
+.leaflet-popup-content-wrapper{background:rgba(4,4,20,0.97);border:1px solid rgba(0,180,255,0.18);border-radius:10px;color:#fff;font-family:-apple-system,sans-serif;box-shadow:0 8px 32px rgba(0,0,0,0.9)}
+.leaflet-popup-tip{background:rgba(4,4,20,0.97)}
+.leaflet-popup-content{margin:10px 13px;font-size:12px;line-height:1.5;min-width:150px}
+.popup-loc{font-size:10px;font-weight:700;color:var(--cyan);margin-bottom:3px;letter-spacing:0.5px}
+.popup-title{font-size:12px;color:#dde;margin-bottom:3px;line-height:1.3}
+.popup-time{font-size:10px;color:rgba(255,255,255,0.3)}
+
+/* VER TODAS MODAL */
+#modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:600;display:none;backdrop-filter:blur(6px);align-items:flex-end}
+#modal-overlay.open{display:flex}
+#modal{background:#0a0a12;border-radius:18px 18px 0 0;width:100%;max-height:80vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.08);border-bottom:none}
+#modal-handle{width:36px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;margin:10px auto 0}
+#modal-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06)}
+#modal-title{font-size:14px;font-weight:600;letter-spacing:1px}
+#modal-close{font-size:20px;cursor:pointer;opacity:0.5;background:none;border:none;color:#fff}
+#modal-list{overflow-y:auto;flex:1;padding:8px 0}
 </style>
 </head>
 <body>
@@ -116,15 +145,38 @@ body{font-family:-apple-system,'SF Pro Display',sans-serif;background:#000;color
     </div>
   </div>
   <div id="live-pill"><div id="live-dot"></div>EN VIVO</div>
-  <div id="header-icons">
-    <span>🔔</span>
-    <span>☰</span>
+  <div id="header-right">
+    <button id="bell-btn">🔔</button>
+    <button id="menu-btn">☰</button>
+  </div>
+</div>
+
+<!-- SIDE MENU -->
+<div id="menu-overlay">
+  <div id="side-menu">
+    <button id="menu-close">✕</button>
+    <div id="menu-header">
+      <div id="menu-logo">ORVEX</div>
+      <div id="menu-sub">SEE THE WORLD FIRST</div>
+    </div>
+    <div class="menu-item" onclick="closeMenu()">🌍 <span>Mapa Mundial</span></div>
+    <div class="menu-item">📈 <span>Tendencias</span></div>
+    <div class="menu-item">🔔 <span>Alertas</span></div>
+    <div class="menu-item">🔖 <span>Guardados</span></div>
+    <div class="menu-divider"></div>
+    <div class="menu-item">⚙️ <span>Configuración</span></div>
+    <div class="menu-item">🌙 <span>Modo Oscuro</span></div>
+    <div class="menu-item">📤 <span>Compartir App</span></div>
+    <div class="menu-divider"></div>
+    <div class="menu-item">💬 <span>Feedback</span></div>
+    <div class="menu-item">❓ <span>Ayuda</span></div>
+    <div id="menu-version">ORVEX v1.0.0 · orvex-chi.vercel.app</div>
   </div>
 </div>
 
 <!-- HERO -->
 <div id="hero">
-  <canvas id="globe-canvas"></canvas>
+  <canvas id="hero-canvas"></canvas>
   <div id="hero-overlay"></div>
   <div id="hero-text">
     <div id="hero-title1">EL MUNDO</div>
@@ -133,14 +185,16 @@ body{font-family:-apple-system,'SF Pro Display',sans-serif;background:#000;color
   </div>
   <div id="activity-box">
     <div id="act-label">ACTIVIDAD GLOBAL</div>
-    <b id="act-count">—</b>
+    <b id="act-count">14,021</b>
     <div id="act-change">▲ 18.6% últimas 24h</div>
   </div>
 </div>
 
-<!-- MAP -->
-<div id="map-section">
-  <div id="map"></div>
+<!-- GLOBE OVAL MAP -->
+<div id="globe-section">
+  <div id="globe-wrapper">
+    <div id="map"></div>
+  </div>
 </div>
 
 <!-- CATEGORIES -->
@@ -158,7 +212,7 @@ body{font-family:-apple-system,'SF Pro Display',sans-serif;background:#000;color
 <div id="news-section">
   <div id="news-header">
     <div id="news-header-left"><div id="news-dot"></div>EN DIRECTO</div>
-    <div id="ver-todas">Ver todas</div>
+    <button id="ver-todas-btn" onclick="openModal()">Ver todas</button>
   </div>
   <div id="news-list"></div>
 </div>
@@ -167,7 +221,7 @@ body{font-family:-apple-system,'SF Pro Display',sans-serif;background:#000;color
 <div id="markets-section">
   <div id="markets-header">
     <div id="markets-title">MERCADOS EN VIVO</div>
-    <div id="markets-ver">Ver todas</div>
+    <div id="markets-ver" onclick="openModal()">Ver todas</div>
   </div>
   <div id="markets-row">
     <div class="market-card">
@@ -205,52 +259,57 @@ body{font-family:-apple-system,'SF Pro Display',sans-serif;background:#000;color
 <div id="bottom-nav">
   <div class="nav-item active"><div class="nav-icon">🌍</div><div class="nav-label">Mapa</div></div>
   <div class="nav-item"><div class="nav-icon">📈</div><div class="nav-label">Tendencias</div></div>
-  <div class="nav-item" style="flex:0.8"><div id="nav-center">🎯</div></div>
+  <div id="nav-center-wrap"><div id="nav-center">🎯</div></div>
   <div class="nav-item"><div class="nav-icon">🔔</div><div class="nav-label">Alertas</div></div>
   <div class="nav-item"><div class="nav-icon">🔖</div><div class="nav-label">Guardados</div></div>
 </div>
 
+<!-- MODAL VER TODAS -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div id="modal-handle"></div>
+    <div id="modal-header">
+      <div id="modal-title">TODAS LAS NOTICIAS</div>
+      <button id="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-list"></div>
+  </div>
+</div>
+
 <script>
-const catColors={all:'#ffffff',world:'#ff3b3b',business:'#00e87a',technology:'#00b4ff',health:'#9b59ff',science:'#ff8c00',sports:'#ffd700'};
-const catIcons={world:'💥',business:'📊',technology:'💻',health:'🏥',science:'🔬',sports:'⚽'};
+const catColors={all:'#fff',world:'#ff3b3b',business:'#00e87a',technology:'#00b4ff',health:'#9b59ff',science:'#ff8c00',sports:'#ffd700'};
+const catIcons={world:'💥',business:'📊',technology:'💻',health:'💊',science:'🔬',sports:'⚽'};
 
 const countryCoords={
-  us:{name:'EE. UU.',lat:37.09,lng:-95.71},
-  gb:{name:'Reino Unido',lat:55.37,lng:-3.43},
-  de:{name:'Alemania',lat:51.16,lng:10.45},
-  fr:{name:'Francia',lat:46.22,lng:2.21},
-  jp:{name:'Japón',lat:36.20,lng:138.25},
-  cn:{name:'China',lat:35.86,lng:104.19},
-  in:{name:'India',lat:20.59,lng:78.96},
-  br:{name:'Brasil',lat:-14.23,lng:-51.92},
-  ru:{name:'Rusia',lat:61.52,lng:105.31},
-  au:{name:'Australia',lat:-25.27,lng:133.77},
-  mx:{name:'México',lat:23.63,lng:-102.55},
-  es:{name:'España',lat:40.46,lng:-3.74},
-  ar:{name:'Argentina',lat:-38.41,lng:-63.61},
-  pe:{name:'Perú',lat:-9.19,lng:-75.01},
-  za:{name:'Sudáfrica',lat:-30.55,lng:22.93},
-  ng:{name:'Nigeria',lat:9.08,lng:8.67},
-  eg:{name:'Egipto',lat:26.82,lng:30.80},
-  kr:{name:'Corea del Sur',lat:35.90,lng:127.76},
-  ae:{name:'Emiratos',lat:23.42,lng:53.84},
-  ua:{name:'Ucrania',lat:48.37,lng:31.16},
-  ir:{name:'Irán',lat:32.42,lng:53.68},
+  us:{name:'EE. UU.',lat:37.09,lng:-95.71},gb:{name:'Reino Unido',lat:55.37,lng:-3.43},
+  de:{name:'Alemania',lat:51.16,lng:10.45},fr:{name:'Francia',lat:46.22,lng:2.21},
+  jp:{name:'Japón',lat:36.20,lng:138.25},cn:{name:'China',lat:35.86,lng:104.19},
+  in:{name:'India',lat:20.59,lng:78.96},br:{name:'Brasil',lat:-14.23,lng:-51.92},
+  ru:{name:'Rusia',lat:61.52,lng:105.31},au:{name:'Australia',lat:-25.27,lng:133.77},
+  mx:{name:'México',lat:23.63,lng:-102.55},es:{name:'España',lat:40.46,lng:-3.74},
+  ar:{name:'Argentina',lat:-38.41,lng:-63.61},pe:{name:'Perú',lat:-9.19,lng:-75.01},
+  za:{name:'Sudáfrica',lat:-30.55,lng:22.93},ng:{name:'Nigeria',lat:9.08,lng:8.67},
+  eg:{name:'Egipto',lat:26.82,lng:30.80},kr:{name:'Corea del Sur',lat:35.90,lng:127.76},
+  ae:{name:'Emiratos',lat:23.42,lng:53.84},ua:{name:'Ucrania',lat:48.37,lng:31.16},
+  ir:{name:'Irán',lat:32.42,lng:53.68},co:{name:'Colombia',lat:4.57,lng:-74.29},
 };
 
 const fallbackNews=[
-  {title:'Explosiones reportadas en el centro de la ciudad',source:'Reuters',cat:'world',country:'ua',time:'Hace 2 min',urgent:true},
-  {title:'Tensión militar elevada en la región',source:'Al Jazeera',cat:'world',country:'ir',time:'Hace 15 min'},
-  {title:'Caída del mercado bursátil en Asia',source:'Bloomberg',cat:'business',country:'jp',time:'Hace 7 min'},
-  {title:'Protestas masivas en avenida principal',source:'BBC',cat:'world',country:'br',time:'Hace 32 min'},
-  {title:'La oposición lidera los primeros resultados',source:'CNN',cat:'world',country:'za',time:'Hace 11 min'},
-  {title:'Empresa lanza nuevo modelo de inteligencia artificial',source:'TechCrunch',cat:'technology',country:'us',time:'Hace 14 min'},
+  {title:'Explosiones reportadas en el centro de Kiev',source:'Reuters',cat:'world',country:'ua',time:'Hace 2 min',urgent:true},
+  {title:'Tensión militar elevada en la región de Irán',source:'Al Jazeera',cat:'world',country:'ir',time:'Hace 15 min'},
+  {title:'Caída del mercado bursátil japonés más del 3%',source:'Bloomberg',cat:'business',country:'jp',time:'Hace 7 min'},
+  {title:'Protestas masivas en São Paulo, Brasil',source:'BBC',cat:'world',country:'br',time:'Hace 32 min'},
+  {title:'La oposición lidera primeros resultados en Sudáfrica',source:'CNN',cat:'world',country:'za',time:'Hace 11 min'},
+  {title:'Empresa de EE. UU. lanza nuevo modelo de IA',source:'TechCrunch',cat:'technology',country:'us',time:'Hace 14 min'},
   {title:'Nuevo tratamiento contra el cáncer logra resultados históricos',source:'Lancet',cat:'health',country:'gb',time:'Hace 28 min'},
   {title:'Acuerdo comercial firmado entre bloques económicos',source:'FT',cat:'business',country:'de',time:'Hace 41 min'},
   {title:'SpaceX lanza misión tripulada a la estación espacial',source:'Space.com',cat:'science',country:'us',time:'Hace 55 min'},
-  {title:'Champions League: resultados y clasificados a cuartos',source:'ESPN',cat:'sports',country:'es',time:'Hace 1h 2min'},
+  {title:'Champions League: clasificados a cuartos de final',source:'ESPN',cat:'sports',country:'es',time:'Hace 1h 2min'},
   {title:'Terremoto de magnitud 5.8 sacude la costa del Pacífico',source:'USGS',cat:'world',country:'pe',time:'Hace 1h 20min'},
   {title:'Bitcoin supera nuevo récord histórico en mercados globales',source:'CoinDesk',cat:'business',country:'us',time:'Hace 1h 35min'},
+  {title:'OMS alerta sobre nuevo brote de dengue en Asia',source:'OMS',cat:'health',country:'in',time:'Hace 2h'},
+  {title:'Descubrimiento arqueológico revela nueva civilización',source:'Nat Geo',cat:'science',country:'eg',time:'Hace 2h 20min'},
+  {title:'Copa del Mundo: equipos clasificados a cuartos',source:'FIFA',cat:'sports',country:'fr',time:'Hace 2h 40min'},
 ];
 
 const RSS_FEEDS=[
@@ -260,59 +319,52 @@ const RSS_FEEDS=[
   {url:'https://feeds.bbci.co.uk/news/health/rss.xml',source:'BBC Health',cat:'health',country:'gb'},
   {url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',source:'BBC Science',cat:'science',country:'gb'},
   {url:'https://feeds.bbci.co.uk/sport/rss.xml',source:'BBC Sport',cat:'sports',country:'gb'},
+  {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',source:'NY Times',cat:'world',country:'us'},
+  {url:'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',source:'NY Times Tech',cat:'technology',country:'us'},
 ];
 
-let map,markers=[],allNews=fallbackNews,activeFilter='all';
+let map,markers=[],allNews=[...fallbackNews],activeFilter='all';
 
+// MAP INIT
 function initMap(){
-  map=L.map('map',{zoomControl:true,attributionControl:false,dragging:true}).setView([25,15],2);
+  map=L.map('map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,touchZoom:false}).setView([20,10],1);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
 }
 
-function drawGlobe(){
-  const canvas=document.getElementById('globe-canvas');
+// HERO CANVAS
+function drawHero(){
+  const canvas=document.getElementById('hero-canvas');
   const ctx=canvas.getContext('2d');
-  canvas.width=canvas.offsetWidth*2;
-  canvas.height=canvas.offsetHeight*2;
-  ctx.scale(2,2);
-  const w=canvas.offsetWidth,h=canvas.offsetHeight;
-  ctx.clearRect(0,0,w,h);
-  const cx=w*0.62,cy=h*0.5,r=h*0.48;
-  const grad=ctx.createRadialGradient(cx,cy,r*0.1,cx,cy,r);
-  grad.addColorStop(0,'rgba(0,60,120,0.6)');
-  grad.addColorStop(0.5,'rgba(0,20,60,0.4)');
-  grad.addColorStop(1,'rgba(0,0,20,0)');
-  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
-  for(let i=0;i<80;i++){
-    const angle=Math.random()*Math.PI*2;
-    const dist=Math.random()*r;
-    const x=cx+Math.cos(angle)*dist;
-    const y=cy+Math.sin(angle)*dist;
-    if(Math.sqrt((x-cx)**2+(y-cy)**2)>r)continue;
-    const brightness=Math.random();
-    const colors=['#ff3b3b','#9b59ff','#00e87a','#ff8c00','#00b4ff','#ffd700'];
-    const color=colors[Math.floor(Math.random()*colors.length)];
-    ctx.beginPath();ctx.arc(x,y,brightness*2+0.5,0,Math.PI*2);
-    ctx.fillStyle=color;ctx.globalAlpha=0.6+Math.random()*0.4;ctx.fill();
-    if(brightness>0.7){
-      ctx.beginPath();ctx.arc(x,y,4+Math.random()*6,0,Math.PI*2);
-      ctx.fillStyle=color;ctx.globalAlpha=0.1;ctx.fill();
-    }
+  canvas.width=window.innerWidth*2;canvas.height=130*2;ctx.scale(2,2);
+  const w=window.innerWidth,h=130;
+  for(let i=0;i<120;i++){
+    const x=Math.random()*w,y=Math.random()*h;
+    const colors=['#ff3b3b','#9b59ff','#00e87a','#ff8c00','#00b4ff','#ffd700','#fff'];
+    ctx.beginPath();ctx.arc(x,y,Math.random()*1.5+0.3,0,Math.PI*2);
+    ctx.fillStyle=colors[Math.floor(Math.random()*colors.length)];
+    ctx.globalAlpha=0.3+Math.random()*0.5;ctx.fill();
   }
   ctx.globalAlpha=1;
 }
 
-function jitter(lat,lng){return[lat+(Math.random()-0.5)*6,lng+(Math.random()-0.5)*6];}
+function jitter(lat,lng){return[lat+(Math.random()-0.5)*5,lng+(Math.random()-0.5)*5];}
 function getCoords(c){const d=countryCoords[c]||countryCoords.us;return jitter(d.lat,d.lng);}
 function getCountryName(c){return(countryCoords[c]||{name:'Mundial'}).name;}
+function timeAgo(d){
+  try{const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);
+  if(m<1)return'Ahora';if(m<60)return'Hace '+m+' min';
+  const h=Math.floor(m/60);if(h<24)return'Hace '+h+'h';return'Hace '+Math.floor(h/24)+'d';}
+  catch(e){return'Reciente';}
+}
 
+// RSS FETCH
 async function fetchRSS(){
   try{
     const results=await Promise.allSettled(RSS_FEEDS.map(async f=>{
-      const proxy='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(f.url);
-      const res=await fetch(proxy);const data=await res.json();
+      const res=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(f.url));
+      const data=await res.json();
       if(data.status==='ok'&&data.items){
-        return data.items.slice(0,4).map(item=>({
+        return data.items.slice(0,5).map(item=>({
           title:item.title,source:f.source,cat:f.cat,country:f.country,
           url:item.link||'#',image:item.thumbnail||null,time:timeAgo(item.pubDate),
         }));
@@ -325,11 +377,22 @@ async function fetchRSS(){
   renderAll();
 }
 
-function timeAgo(d){
-  try{const diff=Date.now()-new Date(d).getTime(),mins=Math.floor(diff/60000);
-  if(mins<1)return'Ahora';if(mins<60)return'Hace '+mins+' min';
-  const h=Math.floor(mins/60);if(h<24)return'Hace '+h+'h';return'Hace '+Math.floor(h/24)+'d';}
-  catch(e){return'Reciente';}
+function makeNewsItemHTML(n,i,coords){
+  const color=catColors[n.cat]||'#fff';
+  const thumb=n.image
+    ?`<img class="news-thumb" src="${n.image}" onerror="this.style.display='none'" alt=""/>`
+    :`<div class="news-thumb-icon" style="background:${color}18">${catIcons[n.cat]||'📰'}</div>`;
+  return `${thumb}
+    <div class="news-body">
+      <div class="news-top">
+        ${n.urgent?'<span class="news-urgent">URGENTE</span>':''}
+        <span class="news-source-tag" style="color:${color}">${n.source}</span>
+      </div>
+      <div class="news-title">${n.title.slice(0,80)}${n.title.length>80?'...':''}</div>
+      <div class="news-time">${n.time}</div>
+    </div>
+    <div class="news-country">${getCountryName(n.country)}</div>
+    <div class="news-arrow">›</div>`;
 }
 
 function renderAll(){
@@ -340,30 +403,33 @@ function renderAll(){
   filtered.forEach((n,i)=>{
     const color=catColors[n.cat]||'#fff';
     const coords=getCoords(n.country);
-    const markerHtml=`<div style="position:relative;width:32px;height:32px;">
-      <div style="position:absolute;top:0;left:0;width:32px;height:32px;border-radius:50%;border:1.5px solid ${color};opacity:0.3;animation:ringPulse ${1.5+Math.random()}s ${i*0.15}s infinite ease-out;"></div>
-      <div style="position:absolute;top:9px;left:9px;width:14px;height:14px;border-radius:50%;background:${color};box-shadow:0 0 10px ${color},0 0 20px ${color}44;border:2px solid #fff;"></div>
+    const html=`<div style="position:relative;width:30px;height:30px;">
+      <div style="position:absolute;top:0;left:0;width:30px;height:30px;border-radius:50%;border:1px solid ${color};opacity:0.25;animation:rp ${1.8+i*0.1}s ${i*0.12}s infinite ease-out;"></div>
+      <div style="position:absolute;top:8px;left:8px;width:14px;height:14px;border-radius:50%;background:${color};box-shadow:0 0 8px ${color};border:1.5px solid rgba(255,255,255,0.8);"></div>
     </div>`;
-    const m=L.marker([coords[0],coords[1]],{icon:L.divIcon({className:'',html:markerHtml,iconSize:[32,32],iconAnchor:[16,16]})}).addTo(map);
-    m.bindPopup(`<div class="popup-loc">${getCountryName(n.country)}</div><div class="popup-title">${n.title.slice(0,70)}${n.title.length>70?'...':''}</div><div class="popup-time">${n.source} · ${n.time}</div>`);
+    const m=L.marker([coords[0],coords[1]],{icon:L.divIcon({className:'',html,iconSize:[30,30],iconAnchor:[15,15]})}).addTo(map);
+    m.bindPopup(`<div class="popup-loc">${getCountryName(n.country)}</div><div class="popup-title">${n.title.slice(0,65)}...</div><div class="popup-time">${n.source} · ${n.time}</div>`);
     m.on('click',()=>highlightNews(i));
     markers.push(m);
 
     const item=document.createElement('div');
     item.className='news-item';item.id='news-'+i;
-    item.onclick=(()=>{const idx=i,la=coords[0],ln=coords[1];return()=>{map.setView([la,ln],5,{animate:true});markers[idx]&&markers[idx].openPopup();highlightNews(idx);};})();
-    const thumb=n.image
-      ?`<img class="news-thumb" src="${n.image}" onerror="this.style.display='none'" alt=""/>`
-      :`<div class="news-thumb-icon" style="background:${color}22">${catIcons[n.cat]||'📰'}</div>`;
-    item.innerHTML=thumb+
-      `<div class="news-body">
-        <div class="news-meta">${n.urgent?'<span class="news-urgent">URGENTE</span>':''}<span>${n.source}</span></div>
-        <div class="news-title">${n.title.slice(0,75)}${n.title.length>75?'...':''}</div>
-        <div class="news-time">${n.time}</div>
-      </div>
-      <div class="news-country">${getCountryName(n.country)}</div>
-      <div class="news-arrow">›</div>`;
+    item.onclick=(()=>{const idx=i,la=coords[0],ln=coords[1];return()=>{map.setView([la,ln],3,{animate:true});markers[idx]&&markers[idx].openPopup();highlightNews(idx);};})();
+    item.innerHTML=makeNewsItemHTML(n,i,coords);
     list.appendChild(item);
+  });
+
+  renderModal(filtered);
+}
+
+function renderModal(filtered){
+  const ml=document.getElementById('modal-list');ml.innerHTML='';
+  filtered.forEach((n,i)=>{
+    const item=document.createElement('div');
+    item.className='news-item';
+    item.innerHTML=makeNewsItemHTML(n,i,[0,0]);
+    item.onclick=()=>{closeModal();document.getElementById('news-'+i)&&document.getElementById('news-'+i).click();};
+    ml.appendChild(item);
   });
 }
 
@@ -373,6 +439,19 @@ function highlightNews(idx){
   if(el){el.classList.add('active');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
 }
 
+// MENU
+function openMenu(){document.getElementById('menu-overlay').classList.add('open');document.getElementById('side-menu').classList.add('open');}
+function closeMenu(){document.getElementById('menu-overlay').classList.remove('open');document.getElementById('side-menu').classList.remove('open');}
+document.getElementById('menu-btn').onclick=openMenu;
+document.getElementById('menu-close').onclick=closeMenu;
+document.getElementById('menu-overlay').onclick=function(e){if(e.target===this)closeMenu();};
+
+// MODAL
+function openModal(){document.getElementById('modal-overlay').classList.add('open');}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+document.getElementById('modal-overlay').onclick=function(e){if(e.target===this)closeModal();};
+
+// CATEGORIES
 document.querySelectorAll('.cat-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
@@ -380,33 +459,40 @@ document.querySelectorAll('.cat-btn').forEach(btn=>{
   });
 });
 
-function initSparklines(){
-  ['btc','oil','gold','sp'].forEach(id=>{
-    const el=document.getElementById('spark-'+id);
-    if(!el)return;
-    const isUp=id==='btc'||id==='gold';
-    for(let i=0;i<8;i++){
-      const bar=document.createElement('div');
-      bar.className='spark-bar';
-      bar.style.height=(8+Math.random()*12)+'px';
-      bar.style.background=isUp?'var(--green)':'var(--red)';
-      el.appendChild(bar);
+// NAV
+document.querySelectorAll('.nav-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    item.classList.add('active');
+  });
+});
+
+// SPARKLINES
+function initSparks(){
+  [['btc',true],['oil',false],['gold',true],['sp',false]].forEach(([id,up])=>{
+    const el=document.getElementById('spark-'+id);if(!el)return;
+    for(let i=0;i<7;i++){
+      const b=document.createElement('div');b.className='spark-bar';
+      b.style.height=(5+Math.random()*11)+'px';
+      b.style.background=up?'var(--green)':'var(--red)';
+      b.style.opacity='0.5';el.appendChild(b);
     }
   });
 }
 
+// MARKETS
 function animateMarkets(){
   const m=[
-    {id:'m-btc',cid:'m-btc-c',base:63245,sym:''},
-    {id:'m-oil',cid:'m-oil-c',base:82.45,sym:''},
-    {id:'m-gold',cid:'m-gold-c',base:2338,sym:''},
-    {id:'m-sp',cid:'m-sp-c',base:5072,sym:''},
+    {id:'m-btc',cid:'m-btc-c',base:63245,dec:0},
+    {id:'m-oil',cid:'m-oil-c',base:82.45,dec:2},
+    {id:'m-gold',cid:'m-gold-c',base:2338,dec:0},
+    {id:'m-sp',cid:'m-sp-c',base:5072,dec:0},
   ];
   setInterval(()=>{
     m.forEach(mk=>{
       const chg=(Math.random()-0.48)*0.3;mk.base*=(1+chg/100);
       const el=document.getElementById(mk.id);const cel=document.getElementById(mk.cid);
-      if(el)el.textContent=mk.base>999?Math.round(mk.base).toLocaleString():mk.base.toFixed(2);
+      if(el)el.textContent=mk.dec?mk.base.toFixed(mk.dec):Math.round(mk.base).toLocaleString();
       if(cel){cel.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';cel.className='market-change '+(chg>=0?'up':'down');}
     });
   },3000);
@@ -417,20 +503,16 @@ function animateCount(){
   setInterval(()=>{c+=Math.floor(Math.random()*8-2);document.getElementById('act-count').textContent=c.toLocaleString();},2500);
 }
 
-const style=document.createElement('style');
-style.textContent='@keyframes ringPulse{0%{transform:scale(0.6);opacity:0.8}100%{transform:scale(2.2);opacity:0}}';
-document.head.appendChild(style);
+const s=document.createElement('style');
+s.textContent='@keyframes rp{0%{transform:scale(0.5);opacity:0.7}100%{transform:scale(2.5);opacity:0}}';
+document.head.appendChild(s);
 
 window.addEventListener('load',()=>{
-  initMap();
-  drawGlobe();
-  initSparklines();
-  animateMarkets();
-  animateCount();
-  renderAll();
-  fetchRSS();
+  initMap();drawHero();initSparks();animateMarkets();animateCount();
+  renderAll();fetchRSS();
   setInterval(fetchRSS,300000);
 });
+window.addEventListener('resize',drawHero);
 </script>
 </body>
 </html>
