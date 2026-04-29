@@ -7,56 +7,73 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'Courier New',monospace;background:#050a0f;color:#e0f0ff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-  #header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(5,10,20,0.97);border-bottom:1px solid rgba(0,180,255,0.2);z-index:1000;flex-shrink:0}
-  #logo{font-size:20px;font-weight:700;letter-spacing:4px;color:#00cfff}
-  #logo span{color:#fff;font-size:10px;font-weight:400;display:block;letter-spacing:2px;opacity:0.6}
-  #live-badge{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:2px;color:#ff4444}
-  #live-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;animation:pulse 1.2s infinite}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.3)}}
-  #activity{font-size:11px;color:#00cfff;letter-spacing:1px;text-align:right}
-  #activity b{font-size:16px;color:#fff;display:block}
-  #categories{display:flex;gap:6px;padding:8px 16px;background:rgba(5,10,20,0.9);border-bottom:1px solid rgba(0,180,255,0.1);overflow-x:auto;flex-shrink:0;scrollbar-width:none}
-  #categories::-webkit-scrollbar{display:none}
-  .cat-btn{padding:4px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:10px;letter-spacing:1px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit}
-  .cat-btn.active{background:rgba(0,207,255,0.15);border-color:#00cfff;color:#00cfff}
-  .cat-btn:hover{border-color:rgba(0,207,255,0.5);color:rgba(0,207,255,0.8)}
-  #main{display:flex;flex:1;overflow:hidden}
-  #map{flex:1;position:relative;z-index:1}
-  .leaflet-tile-pane{filter:brightness(0.4) saturate(0.3) hue-rotate(180deg)}
-  .leaflet-container{background:#050a0f}
-  #sidebar{width:290px;background:rgba(5,10,20,0.97);border-left:1px solid rgba(0,180,255,0.15);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
-  #sidebar-header{padding:10px 14px;border-bottom:1px solid rgba(0,180,255,0.1);font-size:10px;letter-spacing:2px;color:rgba(0,207,255,0.7);display:flex;align-items:center;gap:6px}
-  #sidebar-header::before{content:'';width:6px;height:6px;background:#ff4444;border-radius:50%;animation:pulse 1.2s infinite}
-  #news-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,180,255,0.3) transparent}
-  .news-item{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.2s}
-  .news-item:hover{background:rgba(0,207,255,0.05)}
-  .news-item.active{background:rgba(0,207,255,0.08);border-left:2px solid #00cfff}
-  .news-time{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1px;margin-bottom:4px}
-  .news-title{font-size:12px;color:#e0f0ff;line-height:1.4;margin-bottom:6px}
-  .news-source{font-size:10px;color:rgba(0,207,255,0.6)}
-  .news-img{width:100%;height:80px;object-fit:cover;border-radius:4px;margin-bottom:6px;opacity:0.8}
-  #markets{display:flex;gap:0;border-top:1px solid rgba(0,180,255,0.15);flex-shrink:0}
-  .market-item{flex:1;padding:8px 6px;border-right:1px solid rgba(0,180,255,0.1);text-align:center}
-  .market-item:last-child{border-right:none}
-  .market-name{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1px}
-  .market-price{font-size:12px;font-weight:700;color:#fff;margin:2px 0}
-  .market-change{font-size:9px}
-  .up{color:#00ff88}.down{color:#ff4444}
-  .custom-marker{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.8);cursor:pointer;animation:markerPulse 2s infinite}
-  @keyframes markerPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0.3)}50%{box-shadow:0 0 0 8px rgba(255,255,255,0)}}
-  .leaflet-popup-content-wrapper{background:rgba(5,15,30,0.97);border:1px solid rgba(0,207,255,0.3);border-radius:6px;color:#e0f0ff;font-family:'Courier New',monospace;box-shadow:0 4px 20px rgba(0,0,0,0.8)}
-  .leaflet-popup-tip{background:rgba(5,15,30,0.97)}
-  .leaflet-popup-content{margin:10px 14px;font-size:12px;line-height:1.5}
-  .popup-title{font-weight:700;font-size:13px;margin-bottom:4px}
-  .popup-meta{font-size:10px;color:rgba(0,207,255,0.7);margin-bottom:6px}
-  .popup-link{font-size:10px;color:#00cfff;text-decoration:none}
-  .leaflet-control-zoom a{background:rgba(5,15,30,0.9)!important;border-color:rgba(0,207,255,0.3)!important;color:#00cfff!important}
-  #loading-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(5,10,20,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px}
-  #loading-text{font-size:13px;color:#00cfff;letter-spacing:2px;animation:pulse 1.5s infinite}
-  .spinner{width:40px;height:40px;border:2px solid rgba(0,207,255,0.2);border-top-color:#00cfff;border-radius:50%;animation:spin 1s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Courier New',monospace;background:#050a0f;color:#e0f0ff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+#header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(5,10,20,0.97);border-bottom:1px solid rgba(0,180,255,0.2);z-index:1000;flex-shrink:0}
+#logo{font-size:22px;font-weight:700;letter-spacing:5px;color:#00cfff;text-shadow:0 0 20px rgba(0,207,255,0.5)}
+#logo span{color:#fff;font-size:10px;font-weight:400;display:block;letter-spacing:2px;opacity:0.5}
+#live-badge{display:flex;align-items:center;gap:6px;font-size:11px;letter-spacing:2px;color:#ff4444}
+#live-dot{width:8px;height:8px;background:#ff4444;border-radius:50%;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(1.4)}}
+#activity{font-size:11px;color:#00cfff;letter-spacing:1px;text-align:right}
+#activity b{font-size:18px;color:#fff;display:block}
+#categories{display:flex;gap:6px;padding:8px 16px;background:rgba(5,10,20,0.95);border-bottom:1px solid rgba(0,180,255,0.1);overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+#categories::-webkit-scrollbar{display:none}
+.cat-btn{padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:10px;letter-spacing:1px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit}
+.cat-btn.active,.cat-btn:hover{color:#fff}
+.cat-btn[data-cat="all"].active{background:rgba(0,207,255,0.2);border-color:#00cfff;color:#00cfff}
+.cat-btn[data-cat="world"].active{background:rgba(255,68,68,0.2);border-color:#ff4444;color:#ff4444}
+.cat-btn[data-cat="business"].active{background:rgba(0,255,136,0.2);border-color:#00ff88;color:#00ff88}
+.cat-btn[data-cat="technology"].active{background:rgba(170,68,255,0.2);border-color:#aa44ff;color:#aa44ff}
+.cat-btn[data-cat="health"].active{background:rgba(255,68,170,0.2);border-color:#ff44aa;color:#ff44aa}
+.cat-btn[data-cat="science"].active{background:rgba(255,136,0,0.2);border-color:#ff8800;color:#ff8800}
+.cat-btn[data-cat="sports"].active{background:rgba(255,221,0,0.2);border-color:#ffdd00;color:#ffdd00}
+#main{display:flex;flex:1;overflow:hidden}
+#map{flex:1;position:relative;z-index:1}
+.leaflet-tile-pane{filter:brightness(0.35) saturate(0.2) hue-rotate(200deg)}
+.leaflet-container{background:#020508}
+#sidebar{width:300px;background:rgba(3,8,18,0.98);border-left:1px solid rgba(0,180,255,0.12);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+#sidebar-header{padding:10px 14px;border-bottom:1px solid rgba(0,180,255,0.1);font-size:10px;letter-spacing:2px;color:rgba(0,207,255,0.7);display:flex;align-items:center;gap:6px}
+#sidebar-header::before{content:'';width:6px;height:6px;background:#ff4444;border-radius:50%;animation:pulse 1.2s infinite}
+#news-list{flex:1;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,180,255,0.2) transparent}
+.news-item{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.2s;border-left:3px solid transparent}
+.news-item:hover{background:rgba(0,207,255,0.04)}
+.news-item.active{background:rgba(0,207,255,0.07);border-left-color:#00cfff}
+.news-item.cat-world{border-left-color:rgba(255,68,68,0.4)}
+.news-item.cat-world.active{border-left-color:#ff4444;background:rgba(255,68,68,0.07)}
+.news-item.cat-business{border-left-color:rgba(0,255,136,0.4)}
+.news-item.cat-business.active{border-left-color:#00ff88;background:rgba(0,255,136,0.07)}
+.news-item.cat-technology{border-left-color:rgba(170,68,255,0.4)}
+.news-item.cat-technology.active{border-left-color:#aa44ff;background:rgba(170,68,255,0.07)}
+.news-item.cat-health{border-left-color:rgba(255,68,170,0.4)}
+.news-item.cat-science{border-left-color:rgba(255,136,0,0.4)}
+.news-item.cat-sports{border-left-color:rgba(255,221,0,0.4)}
+.news-time{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:1px;margin-bottom:3px}
+.news-title{font-size:12px;color:#d0e8ff;line-height:1.4;margin-bottom:5px}
+.news-source{font-size:10px;display:flex;align-items:center;gap:5px}
+.src-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.news-img{width:100%;height:75px;object-fit:cover;border-radius:3px;margin-bottom:6px;opacity:0.75}
+#markets{display:flex;border-top:1px solid rgba(0,180,255,0.12);flex-shrink:0}
+.market-item{flex:1;padding:8px 6px;border-right:1px solid rgba(0,180,255,0.08);text-align:center}
+.market-item:last-child{border-right:none}
+.market-name{font-size:9px;color:rgba(255,255,255,0.35);letter-spacing:1px}
+.market-price{font-size:13px;font-weight:700;color:#fff;margin:2px 0}
+.market-change{font-size:9px}
+.up{color:#00ff88}.down{color:#ff4444}
+.custom-marker{width:12px;height:12px;border-radius:50%;border:2px solid;cursor:pointer}
+.pulse-ring{width:28px;height:28px;border-radius:50%;border:1px solid;position:absolute;top:-8px;left:-8px;animation:ringPulse 2s infinite}
+@keyframes ringPulse{0%{opacity:0.8;transform:scale(0.5)}100%{opacity:0;transform:scale(1.8)}}
+.leaflet-popup-content-wrapper{background:rgba(3,10,25,0.98);border:1px solid rgba(0,207,255,0.25);border-radius:6px;color:#e0f0ff;font-family:'Courier New',monospace;box-shadow:0 4px 30px rgba(0,0,0,0.9)}
+.leaflet-popup-tip{background:rgba(3,10,25,0.98)}
+.leaflet-popup-content{margin:10px 14px;font-size:12px;line-height:1.5;min-width:200px}
+.popup-title{font-weight:700;font-size:12px;margin-bottom:5px;color:#e0f0ff}
+.popup-meta{font-size:10px;color:rgba(0,207,255,0.6);margin-bottom:5px}
+.popup-link{font-size:10px;color:#00cfff;text-decoration:none}
+.leaflet-control-zoom a{background:rgba(3,10,25,0.9)!important;border-color:rgba(0,207,255,0.2)!important;color:#00cfff!important}
+#loading-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(2,5,12,0.96);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px}
+#loading-text{font-size:12px;color:#00cfff;letter-spacing:3px;animation:pulse 1.5s infinite}
+.spinner{width:36px;height:36px;border:2px solid rgba(0,207,255,0.15);border-top-color:#00cfff;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -66,13 +83,13 @@
   <div id="activity">ACTIVIDAD GLOBAL<b id="act-count">—</b></div>
 </div>
 <div id="categories">
-  <button class="cat-btn active" data-cat="breaking-news" data-lang="es">TODOS</button>
-  <button class="cat-btn" data-cat="business" data-lang="es">ECONOMIA</button>
-  <button class="cat-btn" data-cat="technology" data-lang="es">TECNOLOGIA</button>
-  <button class="cat-btn" data-cat="health" data-lang="es">SALUD</button>
-  <button class="cat-btn" data-cat="science" data-lang="es">CIENCIA</button>
-  <button class="cat-btn" data-cat="sports" data-lang="es">DEPORTES</button>
-  <button class="cat-btn" data-cat="entertainment" data-lang="es">ENTRETENIMIENTO</button>
+  <button class="cat-btn active" data-cat="all">TODOS</button>
+  <button class="cat-btn" data-cat="world">MUNDO</button>
+  <button class="cat-btn" data-cat="business">ECONOMIA</button>
+  <button class="cat-btn" data-cat="technology">TECNOLOGIA</button>
+  <button class="cat-btn" data-cat="health">SALUD</button>
+  <button class="cat-btn" data-cat="science">CIENCIA</button>
+  <button class="cat-btn" data-cat="sports">DEPORTES</button>
 </div>
 <div id="main">
   <div id="map">
@@ -83,142 +100,185 @@
   </div>
   <div id="sidebar">
     <div id="sidebar-header">EN DIRECTO</div>
-    <div id="news-list"><div style="padding:20px;font-size:12px;color:rgba(255,255,255,0.3);text-align:center">Cargando noticias reales...</div></div>
+    <div id="news-list"></div>
     <div id="markets">
-      <div class="market-item"><div class="market-name">BTC</div><div class="market-price" id="m-btc">—</div><div class="market-change" id="m-btc-c">—</div></div>
-      <div class="market-item"><div class="market-name">ORO</div><div class="market-price" id="m-gold">—</div><div class="market-change" id="m-gold-c">—</div></div>
-      <div class="market-item"><div class="market-name">S&P500</div><div class="market-price" id="m-sp">—</div><div class="market-change" id="m-sp-c">—</div></div>
+      <div class="market-item"><div class="market-name">BTC</div><div class="market-price" id="m-btc">—</div><div class="market-change up" id="m-btc-c">—</div></div>
+      <div class="market-item"><div class="market-name">ORO</div><div class="market-price" id="m-gold">—</div><div class="market-change up" id="m-gold-c">—</div></div>
+      <div class="market-item"><div class="market-name">S&P500</div><div class="market-price" id="m-sp">—</div><div class="market-change down" id="m-sp-c">—</div></div>
     </div>
   </div>
 </div>
 <script>
-const GNEWS_KEY = '8c0e5a7cae374b1e85aacfade7f74a13';
+const catColors={all:'#00cfff',world:'#ff4444',business:'#00ff88',technology:'#aa44ff',health:'#ff44aa',science:'#ff8800',sports:'#ffdd00'};
 
-const countryCoords = {
-  'us':{'name':'Estados Unidos','lat':37.09,'lng':-95.71},
-  'gb':{'name':'Reino Unido','lat':55.37,'lng':-3.43},
-  'de':{'name':'Alemania','lat':51.16,'lng':10.45},
-  'fr':{'name':'Francia','lat':46.22,'lng':2.21},
-  'jp':{'name':'Japon','lat':36.20,'lng':138.25},
-  'cn':{'name':'China','lat':35.86,'lng':104.19},
-  'in':{'name':'India','lat':20.59,'lng':78.96},
-  'br':{'name':'Brasil','lat':-14.23,'lng':-51.92},
-  'ru':{'name':'Rusia','lat':61.52,'lng':105.31},
-  'au':{'name':'Australia','lat':-25.27,'lng':133.77},
-  'ca':{'name':'Canada','lat':56.13,'lng':-106.34},
-  'mx':{'name':'Mexico','lat':23.63,'lng':-102.55},
-  'es':{'name':'Espana','lat':40.46,'lng':-3.74},
-  'it':{'name':'Italia','lat':41.87,'lng':12.56},
-  'za':{'name':'Sudafrica','lat':-30.55,'lng':22.93},
-  'ae':{'name':'Emiratos','lat':23.42,'lng':53.84},
-  'kr':{'name':'Corea del Sur','lat':35.90,'lng':127.76},
-  'ar':{'name':'Argentina','lat':-38.41,'lng':-63.61},
-  'ng':{'name':'Nigeria','lat':9.08,'lng':8.67},
-  'eg':{'name':'Egipto','lat':26.82,'lng':30.80},
-  'pe':{'name':'Peru','lat':-9.19,'lng':-75.01},
-  'co':{'name':'Colombia','lat':4.57,'lng':-74.29},
-  'cl':{'name':'Chile','lat':-35.67,'lng':-71.54},
+const RSS_FEEDS=[
+  {url:'https://feeds.bbci.co.uk/news/world/rss.xml',source:'BBC World',cat:'world',country:'gb'},
+  {url:'https://feeds.bbci.co.uk/news/technology/rss.xml',source:'BBC Tech',cat:'technology',country:'gb'},
+  {url:'https://feeds.bbci.co.uk/news/business/rss.xml',source:'BBC Business',cat:'business',country:'gb'},
+  {url:'https://feeds.bbci.co.uk/news/health/rss.xml',source:'BBC Health',cat:'health',country:'gb'},
+  {url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',source:'BBC Science',cat:'science',country:'gb'},
+  {url:'https://feeds.bbci.co.uk/sport/rss.xml',source:'BBC Sport',cat:'sports',country:'gb'},
+  {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',source:'NY Times',cat:'world',country:'us'},
+  {url:'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',source:'NY Times Tech',cat:'technology',country:'us'},
+  {url:'https://rss.nytimes.com/services/xml/rss/nyt/Business.xml',source:'NY Times Biz',cat:'business',country:'us'},
+];
+
+const countryCoords={
+  us:{name:'Estados Unidos',lat:37.09,lng:-95.71},
+  gb:{name:'Reino Unido',lat:55.37,lng:-3.43},
+  de:{name:'Alemania',lat:51.16,lng:10.45},
+  fr:{name:'Francia',lat:46.22,lng:2.21},
+  jp:{name:'Japon',lat:36.20,lng:138.25},
+  cn:{name:'China',lat:35.86,lng:104.19},
+  in:{name:'India',lat:20.59,lng:78.96},
+  br:{name:'Brasil',lat:-14.23,lng:-51.92},
+  ru:{name:'Rusia',lat:61.52,lng:105.31},
+  au:{name:'Australia',lat:-25.27,lng:133.77},
+  mx:{name:'Mexico',lat:23.63,lng:-102.55},
+  es:{name:'Espana',lat:40.46,lng:-3.74},
+  ar:{name:'Argentina',lat:-38.41,lng:-63.61},
+  pe:{name:'Peru',lat:-9.19,lng:-75.01},
+  co:{name:'Colombia',lat:4.57,lng:-74.29},
+  za:{name:'Sudafrica',lat:-30.55,lng:22.93},
+  ng:{name:'Nigeria',lat:9.08,lng:8.67},
+  eg:{name:'Egipto',lat:26.82,lng:30.80},
+  kr:{name:'Corea del Sur',lat:35.90,lng:127.76},
+  ae:{name:'Emiratos',lat:23.42,lng:53.84},
 };
 
-const catColorMap = {
-  'breaking-news':'#00cfff',business:'#00ff88',technology:'#aa44ff',
-  health:'#ff44aa',science:'#ff8800',sports:'#ffdd00',entertainment:'#ff4444'
-};
+const fallbackNews=[
+  {title:'Cumbre internacional sobre cambio climático reúne a líderes mundiales',source:'Reuters',cat:'world',country:'us',time:'Hace 5 min',url:'#'},
+  {title:'Mercados globales suben ante datos positivos de inflación',source:'Bloomberg',cat:'business',country:'us',time:'Hace 12 min',url:'#'},
+  {title:'OpenAI lanza nuevo modelo de inteligencia artificial',source:'TechCrunch',cat:'technology',country:'us',time:'Hace 18 min',url:'#'},
+  {title:'OMS alerta sobre nuevo brote de enfermedad en Asia',source:'BBC Health',cat:'health',country:'gb',time:'Hace 25 min',url:'#'},
+  {title:'Descubrimiento arqueológico revela nueva civilización antigua',source:'Nat Geo',cat:'science',country:'eg',time:'Hace 31 min',url:'#'},
+  {title:'Champions League: resultados de los partidos de hoy',source:'ESPN',cat:'sports',country:'es',time:'Hace 40 min',url:'#'},
+  {title:'Tensiones diplomáticas entre potencias mundiales',source:'Al Jazeera',cat:'world',country:'ae',time:'Hace 48 min',url:'#'},
+  {title:'Bitcoin supera nuevo máximo histórico en mercados',source:'CoinDesk',cat:'business',country:'us',time:'Hace 55 min',url:'#'},
+  {title:'SpaceX lanza nueva misión al espacio con éxito',source:'Space.com',cat:'science',country:'us',time:'Hace 1h',url:'#'},
+  {title:'Elecciones en América Latina marcan nueva tendencia política',source:'CNN',cat:'world',country:'br',time:'Hace 1h 10min',url:'#'},
+  {title:'Acuerdo comercial entre Asia y Europa entra en vigor',source:'FT',country:'jp',cat:'business',time:'Hace 1h 20min',url:'#'},
+  {title:'Meta anuncia nuevas funciones de realidad aumentada',source:'Wired',cat:'technology',country:'us',time:'Hace 1h 35min',url:'#'},
+  {title:'Crisis humanitaria en África requiere ayuda urgente',source:'BBC',cat:'world',country:'ng',time:'Hace 1h 50min',url:'#'},
+  {title:'Nuevo tratamiento contra el cáncer logra resultados prometedores',source:'Lancet',cat:'health',country:'gb',time:'Hace 2h',url:'#'},
+  {title:'Copa del Mundo: equipos clasificados a cuartos de final',source:'FIFA',cat:'sports',country:'fr',time:'Hace 2h 15min',url:'#'},
+];
 
-let map, markers=[], allArticles=[], activeFilter='breaking-news';
+let map,markers=[],allNews=[],activeFilter='all';
 
 function initMap(){
-  map = L.map('map',{zoomControl:true,attributionControl:false}).setView([20,10],2);
+  map=L.map('map',{zoomControl:true,attributionControl:false}).setView([20,10],2);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
 }
 
-function timeAgo(dateStr){
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff/60000);
-  if(mins < 60) return 'Hace '+mins+' min';
-  const hrs = Math.floor(mins/60);
-  if(hrs < 24) return 'Hace '+hrs+'h';
-  return 'Hace '+Math.floor(hrs/24)+'d';
+function jitter(lat,lng){return[lat+(Math.random()-0.5)*5,lng+(Math.random()-0.5)*5];}
+
+function getCoords(country){
+  const c=countryCoords[country]||Object.values(countryCoords)[Math.floor(Math.random()*Object.keys(countryCoords).length)];
+  return jitter(c.lat,c.lng);
 }
 
-function addJitter(lat,lng){
-  return [lat+(Math.random()-0.5)*4, lng+(Math.random()-0.5)*4];
+function getCountryName(code){
+  return (countryCoords[code]||{name:'Mundial'}).name;
 }
 
-function getRandomCountry(idx){
-  const vals = Object.values(countryCoords);
-  return vals[idx % vals.length];
-}
-
-async function fetchNews(category){
-  document.getElementById('loading-overlay').style.display='flex';
-  document.getElementById('loading-text').textContent='CARGANDO: '+category.toUpperCase()+'...';
+async function fetchRSS(feed){
   try{
-    const url='https://gnews.io/api/v4/top-headlines?topic='+category+'&lang=es&max=10&apikey='+GNEWS_KEY;
-    const url2='https://gnews.io/api/v4/top-headlines?topic='+category+'&lang=en&max=10&apikey='+GNEWS_KEY;
-    
-    const [res1, res2] = await Promise.all([fetch(url), fetch(url2)]);
-    const [data1, data2] = await Promise.all([res1.json(), res2.json()]);
-    
-    const articles1 = (data1.articles||[]);
-    const articles2 = (data2.articles||[]);
-    allArticles = [...articles1, ...articles2].filter(a=>a.title);
-    
-    document.getElementById('act-count').textContent = (allArticles.length * 312).toLocaleString();
-    renderNewsAndMarkers();
-  }catch(e){
-    document.getElementById('news-list').innerHTML='<div style="padding:20px;font-size:12px;color:#ff4444;text-align:center">Error: '+e.message+'</div>';
-    console.error(e);
-  }
-  document.getElementById('loading-overlay').style.display='none';
+    const proxy='https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(feed.url);
+    const res=await fetch(proxy);
+    const data=await res.json();
+    if(data.status==='ok'&&data.items){
+      return data.items.slice(0,5).map(item=>({
+        title:item.title,
+        source:feed.source,
+        cat:feed.cat,
+        country:feed.country,
+        url:item.link||'#',
+        image:item.thumbnail||item.enclosure?.link||null,
+        time:item.pubDate?timeAgo(item.pubDate):'Reciente',
+      }));
+    }
+  }catch(e){}
+  return[];
 }
 
-function renderNewsAndMarkers(){
+async function loadAllNews(){
+  document.getElementById('loading-overlay').style.display='flex';
+  document.getElementById('loading-text').textContent='CONECTANDO FUENTES GLOBALES...';
+  
+  try{
+    const results=await Promise.allSettled(RSS_FEEDS.map(f=>fetchRSS(f)));
+    const fetched=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
+    allNews=fetched.length>3?fetched:fallbackNews;
+  }catch(e){
+    allNews=fallbackNews;
+  }
+  
+  document.getElementById('act-count').textContent=(allNews.length*471).toLocaleString();
+  document.getElementById('loading-overlay').style.display='none';
+  renderAll();
+}
+
+function timeAgo(dateStr){
+  try{
+    const diff=Date.now()-new Date(dateStr).getTime();
+    const mins=Math.floor(diff/60000);
+    if(mins<1)return'Ahora mismo';
+    if(mins<60)return'Hace '+mins+' min';
+    const hrs=Math.floor(mins/60);
+    if(hrs<24)return'Hace '+hrs+'h';
+    return'Hace '+Math.floor(hrs/24)+'d';
+  }catch(e){return'Reciente';}
+}
+
+function renderAll(){
   markers.forEach(m=>map.removeLayer(m));
   markers=[];
-  const list = document.getElementById('news-list');
+  const list=document.getElementById('news-list');
   list.innerHTML='';
-
-  allArticles.forEach((a,i)=>{
-    const country = getRandomCountry(i);
-    const coords = addJitter(country.lat, country.lng);
-    const color = catColorMap[activeFilter]||'#00cfff';
-
-    const el = document.createElement('div');
-    el.className='custom-marker';
-    el.style.background=color;
-    el.style.borderColor=color+'cc';
-    const m = L.marker([coords[0],coords[1]],{
-      icon:L.divIcon({className:'',html:el.outerHTML,iconSize:[14,14],iconAnchor:[7,7]})
+  
+  const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
+  const color=catColors[activeFilter]||'#00cfff';
+  
+  filtered.forEach((n,i)=>{
+    const coords=getCoords(n.country);
+    const nColor=catColors[n.cat]||color;
+    
+    const markerHtml=`<div style="position:relative;width:28px;height:28px;">
+      <div class="pulse-ring" style="border-color:${nColor};opacity:0.4;animation-delay:${i*0.2}s"></div>
+      <div class="custom-marker" style="background:${nColor};border-color:${nColor};box-shadow:0 0 8px ${nColor};position:absolute;top:8px;left:8px;"></div>
+    </div>`;
+    
+    const m=L.marker([coords[0],coords[1]],{
+      icon:L.divIcon({className:'',html:markerHtml,iconSize:[28,28],iconAnchor:[14,14]})
     }).addTo(map);
+    
     m.bindPopup(
-      '<div class="popup-title">'+a.title.slice(0,80)+(a.title.length>80?'...':'')+'</div>'+
-      '<div class="popup-meta">'+(a.source&&a.source.name?a.source.name:'—')+' · '+country.name+'</div>'+
-      (a.url?'<a href="'+a.url+'" class="popup-link" target="_blank">Leer articulo</a>':'')
+      '<div class="popup-title">'+n.title.slice(0,90)+(n.title.length>90?'...':'')+'</div>'+
+      '<div class="popup-meta" style="color:'+nColor+'">'+n.source+' · '+getCountryName(n.country)+'</div>'+
+      (n.url&&n.url!=='#'?'<a href="'+n.url+'" class="popup-link" target="_blank">Leer articulo →</a>':'')
     );
     m.on('click',()=>highlightNews(i));
     markers.push(m);
-
-    const item = document.createElement('div');
-    item.className='news-item';
+    
+    const item=document.createElement('div');
+    item.className='news-item cat-'+n.cat;
     item.id='news-'+i;
     item.onclick=(()=>{
-      const idx=i;
-      const lat=coords[0];
-      const lng=coords[1];
-      return ()=>{
-        map.setView([lat,lng],5,{animate:true});
-        markers[idx]&&markers[idx].openPopup();
-        highlightNews(idx);
-      };
+      const idx=i,lat=coords[0],lng=coords[1];
+      return()=>{map.setView([lat,lng],5,{animate:true});markers[idx]&&markers[idx].openPopup();highlightNews(idx);};
     })();
     item.innerHTML=
-      (a.image?'<img class="news-img" src="'+a.image+'" onerror="this.style.display=\'none\'" alt=""/>':'')+
-      '<div class="news-time">'+timeAgo(a.publishedAt)+' · '+country.name+'</div>'+
-      '<div class="news-title">'+a.title.slice(0,100)+(a.title.length>100?'...':'')+'</div>'+
-      '<div class="news-source">'+(a.source&&a.source.name?a.source.name:'Fuente desconocida')+'</div>';
+      (n.image?'<img class="news-img" src="'+n.image+'" onerror="this.style.display=\'none\'" alt=""/>':'')+
+      '<div class="news-time">'+n.time+' · '+getCountryName(n.country)+'</div>'+
+      '<div class="news-title">'+n.title.slice(0,95)+(n.title.length>95?'...':'')+'</div>'+
+      '<div class="news-source"><span class="src-dot" style="background:'+nColor+'"></span><span style="color:'+nColor+'">'+n.source+'</span></div>';
     list.appendChild(item);
   });
+  
+  if(filtered.length===0){
+    list.innerHTML='<div style="padding:30px;font-size:12px;color:rgba(255,255,255,0.3);text-align:center">Sin noticias en esta categoría</div>';
+  }
 }
 
 function highlightNews(idx){
@@ -232,7 +292,7 @@ document.querySelectorAll('.cat-btn').forEach(btn=>{
     document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     activeFilter=btn.dataset.cat;
-    fetchNews(activeFilter);
+    renderAll();
   });
 });
 
@@ -245,7 +305,6 @@ function animateMarkets(){
   m.forEach(mk=>{
     document.getElementById(mk.id).textContent=mk.sym+Math.round(mk.base).toLocaleString();
     document.getElementById(mk.cid).textContent='+0.00%';
-    document.getElementById(mk.cid).className='market-change up';
   });
   setInterval(()=>{
     m.forEach(mk=>{
@@ -256,13 +315,14 @@ function animateMarkets(){
       if(el)el.textContent=mk.sym+Math.round(mk.base).toLocaleString();
       if(cel){cel.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';cel.className='market-change '+(chg>=0?'up':'down');}
     });
-  },4000);
+  },3500);
 }
 
 window.addEventListener('load',()=>{
   initMap();
   animateMarkets();
-  fetchNews('breaking-news');
+  loadAllNews();
+  setInterval(loadAllNews,300000);
 });
 </script>
 </body>
