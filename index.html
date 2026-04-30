@@ -6,240 +6,312 @@
 <title>ORVEX — El Mundo en Tiempo Real</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--red:#ff2d55;--purple:#bf5af2;--green:#30d158;--blue:#0a84ff;--orange:#ff9f0a;--cyan:#64d2ff;--yellow:#ffd60a;--bg:#000;--border:rgba(255,255,255,0.07)}
-html,body{height:100%;overflow:hidden;background:var(--bg)}
-body{font-family:'Syne',sans-serif;color:#fff;display:flex;flex-direction:column}
+html,body{height:100%;overflow:hidden;background:#000}
+body{font-family:'Inter',sans-serif;color:#fff;display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative}
 
 /* HEADER */
-#header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.95);border-bottom:1px solid var(--border);z-index:200;flex-shrink:0;backdrop-filter:blur(20px)}
-#logo-wrap{display:flex;align-items:center;gap:9px}
-#logo-ring{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--cyan);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 0 10px rgba(100,210,255,0.25)}
-#logo-name{font-size:16px;font-weight:800;letter-spacing:3px}
-#logo-tag{font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:2px;font-family:'Space Mono',monospace;display:block;margin-top:1px}
-#live-badge{display:flex;align-items:center;gap:6px;background:rgba(255,45,85,0.1);border:1px solid rgba(255,45,85,0.3);border-radius:30px;padding:5px 12px;font-size:10px;font-weight:700;color:var(--red);letter-spacing:2px;font-family:'Space Mono',monospace}
-#live-dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 5px var(--red)}50%{opacity:0.1;box-shadow:none}}
-#hdr-btns{display:flex;gap:5px}
-.hbtn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all 0.2s}
-.hbtn:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.15)}
+#hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(0,0,0,0.9);z-index:100;flex-shrink:0}
+#logo{display:flex;align-items:center;gap:9px}
+#logo-ic{width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,0.05)}
+#logo-txt{font-size:16px;font-weight:700;letter-spacing:1px}
+#logo-sub{font-size:8px;color:rgba(255,255,255,0.35);display:block;letter-spacing:1px}
+#live-btn{background:rgba(255,60,60,0.15);border:1px solid rgba(255,60,60,0.4);border-radius:20px;padding:5px 12px;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#ff3c3c;letter-spacing:1px}
+#ldot{width:6px;height:6px;background:#ff3c3c;border-radius:50%;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.15}}
+#hdr-ic{display:flex;gap:12px;align-items:center}
+#hdr-ic span{font-size:22px;cursor:pointer;opacity:0.8}
 
-/* HERO */
-#hero{position:relative;flex-shrink:0;height:88px;overflow:hidden;background:#000}
-#hero-canvas{position:absolute;inset:0;width:100%;height:100%}
-#hero-content{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
-#hero-t1{font-size:24px;font-weight:800;color:#fff;line-height:1;letter-spacing:-0.5px}
-#hero-t2{font-size:24px;font-weight:800;line-height:1;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-#hero-sub{font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:2px;margin-top:4px;font-family:'Space Mono',monospace}
-#act-box{text-align:right}
-#act-lbl{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:2px;font-family:'Space Mono',monospace}
-#act-num{font-size:26px;font-weight:800;display:block;line-height:1.1}
-#act-delta{font-size:9px;color:var(--green);font-family:'Space Mono',monospace;margin-top:1px}
+/* HERO TEXT */
+#hero-txt{padding:14px 16px 8px;background:#000;flex-shrink:0}
+#h1{font-size:32px;font-weight:800;color:#fff;line-height:1;letter-spacing:-0.5px}
+#h2{font-size:32px;font-weight:800;line-height:1;background:linear-gradient(90deg,#00cfff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#h3{font-size:12px;color:rgba(255,255,255,0.4);margin-top:5px;font-weight:400}
+#act-row{position:absolute;top:56px;right:14px;text-align:right}
+#act-lbl{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1px}
+#act-num{font-size:28px;font-weight:800;display:block;color:#fff;line-height:1}
+#act-delta{font-size:10px;color:#ff4444;display:flex;align-items:center;gap:2px;justify-content:flex-end}
 
-/* GLOBE */
-#globe-section{flex-shrink:0;display:flex;justify-content:center;align-items:center;background:radial-gradient(ellipse at center,#000d1a 0%,#000 65%);padding:8px 0;height:220px;position:relative}
-#globe-wrap{position:relative;width:200px;height:200px}
-#globe-svg{width:100%;height:100%;cursor:grab;display:block}
+/* GLOBE AREA - MAIN SECTION */
+#globe-area{position:relative;background:#000;flex-shrink:0;height:320px;overflow:hidden}
+#globe-svg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);cursor:grab;z-index:2}
 #globe-svg:active{cursor:grabbing}
-#globe-glow-el{position:absolute;inset:-25px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,120,255,0.1) 0%,transparent 65%);pointer-events:none}
-#zoom-controls{position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:5px}
-.zoom-btn{width:30px;height:30px;border-radius:8px;border:1px solid rgba(100,210,255,0.2);background:rgba(0,0,0,0.6);color:var(--cyan);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;backdrop-filter:blur(10px);transition:all 0.2s}
-.zoom-btn:hover{background:rgba(100,210,255,0.1);border-color:rgba(100,210,255,0.4)}
-#radar-btn{position:absolute;bottom:6px;right:14px;display:flex;align-items:center;gap:4px;font-size:8px;font-weight:700;color:var(--cyan);letter-spacing:2px;font-family:'Space Mono',monospace;cursor:pointer;opacity:0.6;border:none;background:none;transition:opacity 0.2s}
-#radar-btn:hover{opacity:1}
-#globe-tooltip{position:absolute;background:rgba(4,6,22,0.97);border:1px solid rgba(100,210,255,0.2);border-radius:10px;padding:8px 12px;font-size:11px;pointer-events:none;display:none;z-index:100;min-width:140px;box-shadow:0 8px 24px rgba(0,0,0,0.8)}
-#globe-tooltip .tt-loc{font-size:10px;font-weight:700;color:var(--cyan);margin-bottom:3px;font-family:'Space Mono',monospace;letter-spacing:0.5px}
-#globe-tooltip .tt-title{font-size:11px;color:#dde;line-height:1.3;margin-bottom:2px}
-#globe-tooltip .tt-time{font-size:9px;color:rgba(255,255,255,0.3);font-family:'Space Mono',monospace}
 
-/* CATEGORIES */
-#cats{display:flex;overflow-x:auto;gap:5px;padding:7px 13px;background:#000;border-bottom:1px solid var(--border);flex-shrink:0;scrollbar-width:none}
-#cats::-webkit-scrollbar{display:none}
-.cat-btn{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:30px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:rgba(255,255,255,0.4);font-size:10px;cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:'Syne',sans-serif;font-weight:600;letter-spacing:0.5px;flex-shrink:0}
-.cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.cat-btn.active{color:#fff;background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.18)}
+/* CATEGORIES - LEFT VERTICAL */
+#cats-left{position:absolute;left:0;top:0;bottom:0;width:100px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:10px 8px;z-index:5}
+.cat-item{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:10px;cursor:pointer;transition:all 0.2s;opacity:0.55}
+.cat-item.active,.cat-item:hover{opacity:1;background:rgba(255,255,255,0.07)}
+.cat-ic{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.cat-lbl{font-size:11px;font-weight:500;color:#fff}
 
-/* NEWS */
-#news-sec{flex:1;overflow:hidden;display:flex;flex-direction:column;background:#000}
-#news-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 15px;flex-shrink:0;border-bottom:1px solid var(--border)}
-#news-hdr-l{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.6);font-family:'Space Mono',monospace}
-#ndot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:blink 1s infinite}
-#ver-btn{font-size:9px;color:var(--cyan);cursor:pointer;background:none;border:none;font-family:'Space Mono',monospace;opacity:0.7;letter-spacing:1px}
-#news-list{flex:1;overflow-y:auto;scrollbar-width:none}
-#news-list::-webkit-scrollbar{display:none}
-.ni{display:flex;align-items:center;gap:9px;padding:8px 13px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.15s}
-.ni:hover,.ni.active{background:rgba(255,255,255,0.04)}
-.ni-thumb{width:56px;height:40px;border-radius:7px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,0.07)}
-.ni-icon{width:56px;height:40px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px}
+/* FLOATING POPUPS ON GLOBE */
+.globe-popup{position:absolute;background:rgba(10,12,30,0.92);border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:8px 11px;z-index:10;pointer-events:none;backdrop-filter:blur(8px);min-width:140px;animation:fadeInPop 0.3s ease}
+@keyframes fadeInPop{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.gp-loc{font-size:11px;font-weight:700;color:#fff;margin-bottom:2px}
+.gp-desc{font-size:10px;color:rgba(255,255,255,0.55);margin-bottom:2px}
+.gp-time{font-size:9px;color:rgba(255,255,255,0.35)}
+.gp-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+
+/* MODO RADAR */
+#radar-btn{position:absolute;bottom:10px;right:12px;z-index:10;display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#a855f7;letter-spacing:1.5px;cursor:pointer;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);border-radius:20px;padding:5px 10px}
+#radar-ic{width:28px;height:28px;border-radius:50%;border:1.5px solid #a855f7;display:flex;align-items:center;justify-content:center;font-size:13px}
+
+/* NEWS SECTION */
+#news-area{flex:1;overflow-y:auto;background:#000;scrollbar-width:none}
+#news-area::-webkit-scrollbar{display:none}
+#news-hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px}
+#news-hdr-l{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:0.5px}
+#news-hdot{width:7px;height:7px;background:#ff3c3c;border-radius:50%;animation:blink 1s infinite}
+#ver-btn{font-size:12px;color:rgba(255,255,255,0.5);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif}
+.ni{display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background 0.15s}
+.ni:hover,.ni.active{background:rgba(255,255,255,0.03)}
+.ni-thumb-wrap{position:relative;flex-shrink:0}
+.ni-thumb{width:68px;height:52px;border-radius:8px;object-fit:cover;background:rgba(255,255,255,0.08)}
+.ni-icon-wrap{width:68px;height:52px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+.ni-cat-dot{position:absolute;bottom:4px;left:4px;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px}
 .ni-body{flex:1;min-width:0}
-.ni-top{display:flex;align-items:center;gap:4px;margin-bottom:2px}
-.ni-src{font-size:9px;font-family:'Space Mono',monospace;font-weight:700}
-.ni-urg{font-size:8px;color:var(--red);font-weight:700;letter-spacing:1px;font-family:'Space Mono',monospace;background:rgba(255,45,85,0.12);padding:1px 4px;border-radius:3px}
-.ni-title{font-size:12px;font-weight:600;color:#dde;line-height:1.3;margin-bottom:2px}
-.ni-time{font-size:9px;color:rgba(255,255,255,0.2);font-family:'Space Mono',monospace}
-.ni-country{font-size:9px;color:rgba(255,255,255,0.2);flex-shrink:0;text-align:right;font-family:'Space Mono',monospace;min-width:40px}
-.ni-arr{font-size:16px;color:rgba(255,255,255,0.1);flex-shrink:0;margin-left:2px}
+.ni-meta{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.ni-urg{color:#ff3c3c;font-weight:700;font-size:9px;letter-spacing:1px}
+.ni-title{font-size:13px;font-weight:600;color:#eee;line-height:1.35;margin-bottom:2px}
+.ni-desc{font-size:11px;color:rgba(255,255,255,0.35);line-height:1.3;margin-bottom:3px}
+.ni-time{font-size:10px;color:rgba(255,255,255,0.28)}
+.ni-right{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;flex-shrink:0;height:52px}
+.ni-country{font-size:10px;color:rgba(255,255,255,0.3);white-space:nowrap}
+.ni-arr{font-size:18px;color:rgba(255,255,255,0.2)}
 
 /* MARKETS */
-#mkt{background:#000;border-top:1px solid var(--border);flex-shrink:0;padding:7px 13px 9px}
-#mkt-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-#mkt-title{font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.35);font-family:'Space Mono',monospace}
-#mkt-ver{font-size:9px;color:var(--cyan);cursor:pointer;font-family:'Space Mono',monospace;opacity:0.6}
-#mkt-row{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+#mkt-area{background:#000;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding:10px 14px 12px}
+#mkt-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+#mkt-lbl{font-size:12px;font-weight:700;letter-spacing:0.5px;color:rgba(255,255,255,0.7)}
+#mkt-ver{font-size:12px;color:rgba(255,255,255,0.35);cursor:pointer}
+#mkt-row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 #mkt-row::-webkit-scrollbar{display:none}
-.mc{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:11px;padding:7px 10px;flex-shrink:0;min-width:80px}
-.mc-icon{font-size:12px;margin-bottom:2px}
-.mc-name{font-size:8px;color:rgba(255,255,255,0.28);letter-spacing:0.5px;font-family:'Space Mono',monospace}
-.mc-price{font-size:13px;font-weight:800;color:#fff;margin:1px 0;font-family:'Space Mono',monospace}
-.mc-chg{font-size:9px;font-weight:700;font-family:'Space Mono',monospace}
-.up{color:var(--green)}.down{color:var(--red)}
-.spark{height:13px;display:flex;align-items:flex-end;gap:1px;margin-top:3px}
-.sb{width:4px;border-radius:1px;opacity:0.5}
+.mc{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 12px;flex-shrink:0;min-width:96px}
+.mc-top{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.mc-coin{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px}
+.mc-name{font-size:10px;color:rgba(255,255,255,0.45);font-weight:500}
+.mc-price{font-size:16px;font-weight:700;color:#fff;margin-bottom:2px}
+.mc-chg{font-size:11px;font-weight:600}
+.mc-graph{height:22px;display:flex;align-items:flex-end;gap:1.5px;margin-top:5px}
+.mg-bar{flex:1;border-radius:1px;opacity:0.6}
+.up{color:#22c55e}.down{color:#ff3c3c}
+.mg-up{background:#22c55e}.mg-down{background:#ff3c3c}
 
 /* BOTTOM NAV */
-#bnav{display:flex;background:#050505;border-top:1px solid var(--border);flex-shrink:0;padding:4px 0 5px}
-.bni{flex:1;display:flex;flex-direction:column;align-items:center;padding:5px 0;cursor:pointer;opacity:0.28;transition:opacity 0.2s}
+#bnav{display:flex;background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding:6px 10px 8px;align-items:center}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;opacity:0.35;transition:opacity 0.2s;padding:3px 0}
 .bni.active{opacity:1}
-.bni-icon{font-size:17px;margin-bottom:1px}
-.bni-lbl{font-size:7px;letter-spacing:1px;color:rgba(255,255,255,0.45);font-family:'Space Mono',monospace}
-#bnav-ctr{flex:1;display:flex;justify-content:center;align-items:center}
-#bnav-fab{width:46px;height:46px;margin-top:-12px;background:linear-gradient(135deg,var(--cyan),var(--purple));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;cursor:pointer;box-shadow:0 0 18px rgba(100,210,255,0.28),0 0 35px rgba(100,210,255,0.08)}
+.bni-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ff9f0a,#ff2d55);display:flex;align-items:center;justify-content:center;font-size:13px}
+.bni-ic{font-size:20px}
+.bni-lbl{font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:0.3px}
+#bnav-fab-wrap{flex:0.8;display:flex;justify-content:center}
+#bnav-fab{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;margin-top:-14px;box-shadow:0 0 20px rgba(139,92,246,0.4)}
 
 /* SIDE MENU */
-#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:none;backdrop-filter:blur(6px)}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;display:none;backdrop-filter:blur(4px)}
 #overlay.on{display:block}
-#smenu{position:fixed;top:0;right:-290px;width:280px;height:100%;background:#07070f;border-left:1px solid var(--border);z-index:501;transition:right 0.3s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column}
+#smenu{position:fixed;top:0;right:-300px;width:285px;height:100%;background:#090910;border-left:1px solid rgba(255,255,255,0.07);z-index:501;transition:right 0.28s ease;display:flex;flex-direction:column}
 #smenu.on{right:0}
-#smenu-hdr{padding:18px 20px 15px;border-bottom:1px solid var(--border);position:relative}
-#smenu-logo{font-size:19px;font-weight:800;letter-spacing:4px;color:var(--cyan)}
-#smenu-tag{font-size:8px;color:rgba(255,255,255,0.22);letter-spacing:2px;font-family:'Space Mono',monospace;margin-top:2px}
-#smenu-x{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.45)}
-.smi{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:background 0.15s;font-size:13px;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:0.5px}
+#smenu-hdr{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.07)}
+#smenu-logo{font-size:20px;font-weight:800;letter-spacing:3px;color:#00cfff}
+#smenu-tag{font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:2px;margin-top:2px}
+#smenu-x{position:absolute;top:16px;right:14px;width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:rgba(255,255,255,0.4)}
+.smi{display:flex;align-items:center;gap:13px;padding:13px 20px;cursor:pointer;transition:background 0.15s;font-size:14px;font-weight:500;color:rgba(255,255,255,0.6)}
 .smi:hover{background:rgba(255,255,255,0.04);color:#fff}
-.smi-ic{font-size:17px;width:22px;text-align:center}
-.smi-div{height:1px;background:var(--border);margin:5px 0}
-.smi-badge{margin-left:auto;font-size:8px;background:var(--red);color:#fff;padding:2px 6px;border-radius:10px;font-family:'Space Mono',monospace}
-#smenu-ver{padding:15px 20px;font-size:9px;color:rgba(255,255,255,0.12);font-family:'Space Mono',monospace;margin-top:auto}
+.smi-ic{font-size:18px;width:24px;text-align:center}
+.smi-div{height:1px;background:rgba(255,255,255,0.07);margin:5px 0}
+#smenu-ver{padding:18px 20px;font-size:9px;color:rgba(255,255,255,0.12);letter-spacing:1px;margin-top:auto}
 
-/* SUBPAGES */
-.page{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column;overflow:hidden}
+/* PAGES */
+.page{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column;overflow:hidden;max-width:480px;margin:0 auto}
 .page.on{display:flex}
-.page-hdr{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;background:rgba(0,0,0,0.95)}
-.page-back{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
-.page-title{font-size:14px;font-weight:700;letter-spacing:2px;font-family:'Space Mono',monospace}
-.page-body{flex:1;overflow-y:auto;padding:16px}
-.page-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px}
-.page-card h3{font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.5);font-family:'Space Mono',monospace;margin-bottom:10px}
-.trend-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer}
-.trend-item:last-child{border-bottom:none}
-.trend-num{font-size:11px;color:rgba(255,255,255,0.25);font-family:'Space Mono',monospace;width:18px}
-.trend-title{flex:1;font-size:13px;font-weight:600;color:#dde}
-.trend-count{font-size:10px;color:var(--cyan);font-family:'Space Mono',monospace}
-.alert-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
-.alert-item:last-child{border-bottom:none}
-.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
-.alert-body{flex:1}
-.alert-title{font-size:12px;font-weight:600;color:#dde;margin-bottom:3px}
-.alert-time{font-size:9px;color:rgba(255,255,255,0.25);font-family:'Space Mono',monospace}
-.saved-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer}
-.saved-item:last-child{border-bottom:none}
-.saved-icon{font-size:20px;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center}
-.saved-body{flex:1}
-.saved-title{font-size:12px;font-weight:600;color:#dde;margin-bottom:2px}
-.saved-meta{font-size:9px;color:rgba(255,255,255,0.25);font-family:'Space Mono',monospace}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
-.toggle-row:last-child{border-bottom:none}
-.toggle-label{font-size:13px;font-weight:600;color:#dde}
-.toggle{width:44px;height:24px;border-radius:12px;background:rgba(255,255,255,0.1);position:relative;cursor:pointer;transition:background 0.2s}
-.toggle.on{background:var(--green)}
-.toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left 0.2s;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
-.toggle.on::after{left:22px}
+.ph{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;background:rgba(0,0,0,0.95)}
+.pb{width:32px;height:32px;border-radius:9px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.pt{font-size:14px;font-weight:700;letter-spacing:1.5px}
+.pbody{flex:1;overflow-y:auto;padding:14px}
+.pc{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:15px;margin-bottom:10px}
+.pc h3{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:12px}
+.ti{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer}
+.ti:last-child{border-bottom:none}
+.tn{font-size:11px;color:rgba(255,255,255,0.25);width:18px}
+.tt{flex:1;font-size:13px;font-weight:500;color:#eee}
+.tc{font-size:11px;color:#00cfff}
+.ai{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.ai:last-child{border-bottom:none}
+.ad{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.ab{flex:1}
+.at{font-size:12px;font-weight:500;color:#eee;margin-bottom:3px}
+.am{font-size:10px;color:rgba(255,255,255,0.25)}
+.tr{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.tr:last-child{border-bottom:none}
+.tl{font-size:13px;font-weight:500;color:#eee}
+.tog{width:44px;height:24px;border-radius:12px;background:rgba(255,255,255,0.08);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
+.tog.on{background:#22c55e}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.tog.on::after{left:22px}
 
 /* MODAL */
-#modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:600;display:none;align-items:flex-end;backdrop-filter:blur(8px)}
+#modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:600;display:none;align-items:flex-end;backdrop-filter:blur(8px);max-width:480px;margin:0 auto}
 #modal-wrap.on{display:flex}
-#modal{background:#08080f;border-radius:20px 20px 0 0;width:100%;max-height:80vh;display:flex;flex-direction:column;border:1px solid var(--border);border-bottom:none}
-#modal-pill{width:32px;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;margin:9px auto 0}
-#modal-hdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-#modal-ttl{font-size:12px;font-weight:700;letter-spacing:2px;font-family:'Space Mono',monospace}
-#modal-x{width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.45)}
-#modal-body{overflow-y:auto;flex:1}
+#modal{background:#09090f;border-radius:20px 20px 0 0;width:100%;max-height:82vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.07);border-bottom:none}
+#modal-pill{width:32px;height:3px;background:rgba(255,255,255,0.12);border-radius:2px;margin:9px auto 0}
+#mhdr{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.07)}
+#mttl{font-size:12px;font-weight:700;letter-spacing:1.5px}
+#mx{width:26px;height:26px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
+#mbody{overflow-y:auto;flex:1}
 
-/* SHARE TOAST */
-#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(10,10,30,0.97);border:1px solid rgba(100,210,255,0.2);border-radius:12px;padding:10px 18px;font-size:12px;color:#fff;font-family:'Space Mono',monospace;z-index:700;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(10,10,25,0.97);border:1px solid rgba(100,210,255,0.2);border-radius:12px;padding:10px 18px;font-size:12px;color:#fff;z-index:700;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1}
 </style>
 </head>
 <body>
 
-<div id="header">
-  <div id="logo-wrap">
-    <div id="logo-ring">🌐</div>
-    <div><div id="logo-name">ORVEX</div><span id="logo-tag">SEE THE WORLD FIRST</span></div>
+<!-- HEADER -->
+<div id="hdr">
+  <div id="logo">
+    <div id="logo-ic">⊛</div>
+    <div><div id="logo-txt">ORVEX</div><span id="logo-sub">SEE THE WORLD FIRST</span></div>
   </div>
-  <div id="live-badge"><div id="live-dot"></div>EN VIVO</div>
-  <div id="hdr-btns">
-    <div class="hbtn" id="bell-btn" onclick="openPage('alerts-page')">🔔</div>
-    <div class="hbtn" id="menu-btn">☰</div>
-  </div>
-</div>
-
-<div id="hero">
-  <canvas id="hero-canvas"></canvas>
-  <div id="hero-content">
-    <div><div id="hero-t1">EL MUNDO</div><div id="hero-t2">EN TIEMPO REAL</div><div id="hero-sub">EXPLORA · ENTIENDE · ANTICÍPATE</div></div>
-    <div id="act-box"><div id="act-lbl">ACTIVIDAD GLOBAL</div><span id="act-num">14,021</span><div id="act-delta">▲ 18.6% últimas 24h</div></div>
+  <div id="live-btn"><div id="ldot"></div>EN VIVO</div>
+  <div id="hdr-ic">
+    <span onclick="openPage('alerts-page')">🔔</span>
+    <span id="menu-btn">☰</span>
   </div>
 </div>
 
-<div id="globe-section">
-  <div id="globe-wrap">
-    <div id="globe-glow-el"></div>
-    <svg id="globe-svg" viewBox="0 0 200 200"></svg>
-    <div id="globe-tooltip"><div class="tt-loc" id="tt-loc"></div><div class="tt-title" id="tt-title"></div><div class="tt-time" id="tt-time"></div></div>
-  </div>
-  <div id="zoom-controls">
-    <button class="zoom-btn" id="zoom-in">+</button>
-    <button class="zoom-btn" id="zoom-out">−</button>
-  </div>
-  <button id="radar-btn">⊕ MODO RADAR</button>
+<!-- HERO TEXT + ACTIVITY -->
+<div id="hero-txt">
+  <div id="h1">EL MUNDO</div>
+  <div id="h2">EN TIEMPO REAL</div>
+  <div id="h3">Explora. Entiende. Anticípate.</div>
+</div>
+<div id="act-row">
+  <div id="act-lbl">ACTIVIDAD GLOBAL</div>
+  <span id="act-num">14,021</span>
+  <div id="act-delta">▲ 18.6% últimas 24h</div>
 </div>
 
-<div id="cats">
-  <button class="cat-btn active" data-cat="all"><span class="cdot" style="background:#fff"></span>Todos</button>
-  <button class="cat-btn" data-cat="world"><span class="cdot" style="background:#ff2d55"></span>Conflictos</button>
-  <button class="cat-btn" data-cat="business"><span class="cdot" style="background:#30d158"></span>Economía</button>
-  <button class="cat-btn" data-cat="technology"><span class="cdot" style="background:#0a84ff"></span>Tecnología</button>
-  <button class="cat-btn" data-cat="health"><span class="cdot" style="background:#bf5af2"></span>Salud</button>
-  <button class="cat-btn" data-cat="science"><span class="cdot" style="background:#ff9f0a"></span>Ciencia</button>
-  <button class="cat-btn" data-cat="sports"><span class="cdot" style="background:#ffd60a"></span>Deportes</button>
+<!-- GLOBE + CATEGORIES -->
+<div id="globe-area">
+  <!-- Left categories -->
+  <div id="cats-left">
+    <div class="cat-item active" data-cat="all">
+      <div class="cat-ic" style="background:rgba(255,255,255,0.15)">🌐</div>
+      <span class="cat-lbl">Todos</span>
+    </div>
+    <div class="cat-item" data-cat="world">
+      <div class="cat-ic" style="background:rgba(255,45,85,0.2)">🔴</div>
+      <span class="cat-lbl">Conflictos</span>
+    </div>
+    <div class="cat-item" data-cat="politics">
+      <div class="cat-ic" style="background:rgba(168,85,247,0.2)">🟣</div>
+      <span class="cat-lbl">Política</span>
+    </div>
+    <div class="cat-item" data-cat="business">
+      <div class="cat-ic" style="background:rgba(34,197,94,0.2)">🟢</div>
+      <span class="cat-lbl">Economía</span>
+    </div>
+    <div class="cat-item" data-cat="technology">
+      <div class="cat-ic" style="background:rgba(0,180,255,0.2)">🔵</div>
+      <span class="cat-lbl">Tecnología</span>
+    </div>
+    <div class="cat-item" data-cat="science">
+      <div class="cat-ic" style="background:rgba(255,159,10,0.2)">🟠</div>
+      <span class="cat-lbl">Desastres</span>
+    </div>
+    <div class="cat-item" data-cat="health">
+      <div class="cat-ic" style="background:rgba(34,197,94,0.15)">🟢</div>
+      <span class="cat-lbl">Salud</span>
+    </div>
+  </div>
+
+  <!-- Globe SVG -->
+  <svg id="globe-svg" width="280" height="280" viewBox="0 0 280 280"></svg>
+
+  <!-- Floating popups -->
+  <div class="globe-popup" id="popup1" style="top:22%;right:6%">
+    <div class="gp-loc"><span class="gp-dot" style="background:#ff3c3c"></span>Kiev, Ucrania</div>
+    <div class="gp-desc">Explosiones reportadas</div>
+    <div class="gp-time">Hace 2 min</div>
+  </div>
+  <div class="globe-popup" id="popup2" style="top:42%;right:6%">
+    <div class="gp-loc"><span class="gp-dot" style="background:#a855f7"></span>Teherán, Irán</div>
+    <div class="gp-desc">Tensión militar elevada</div>
+    <div class="gp-time">Hace 15 min</div>
+  </div>
+  <div class="globe-popup" id="popup3" style="bottom:18%;left:35%">
+    <div class="gp-loc"><span class="gp-dot" style="background:#22c55e"></span>São Paulo, Brasil</div>
+    <div class="gp-desc">Protestas masivas</div>
+    <div class="gp-time">Hace 32 min</div>
+  </div>
+
+  <!-- Radar button -->
+  <div id="radar-btn">
+    <div id="radar-ic">⊕</div>
+    MODO RADAR
+  </div>
 </div>
 
-<div id="news-sec">
+<!-- NEWS -->
+<div id="news-area">
   <div id="news-hdr">
-    <div id="news-hdr-l"><div id="ndot"></div>EN DIRECTO</div>
-    <button id="ver-btn" onclick="openModal()">VER TODAS →</button>
+    <div id="news-hdr-l"><div id="news-hdot"></div>EN DIRECTO</div>
+    <button id="ver-btn" onclick="openModal()">Ver todas</button>
   </div>
   <div id="news-list"></div>
 </div>
 
-<div id="mkt">
-  <div id="mkt-hdr"><div id="mkt-title">MERCADOS EN VIVO</div><div id="mkt-ver" onclick="openPage('trends-page')">VER TODAS</div></div>
+<!-- MARKETS -->
+<div id="mkt-area">
+  <div id="mkt-hdr"><div id="mkt-lbl">MERCADOS EN VIVO</div><div id="mkt-ver" onclick="openPage('trends-page')">Ver todas</div></div>
   <div id="mkt-row">
-    <div class="mc"><div class="mc-icon">₿</div><div class="mc-name">BTC/USD</div><div class="mc-price" id="m-btc">63,245</div><div class="mc-chg up" id="mc-btc">+2.35%</div><div class="spark" id="sp-btc"></div></div>
-    <div class="mc"><div class="mc-icon">🛢</div><div class="mc-name">PETRÓLEO</div><div class="mc-price" id="m-oil">82.45</div><div class="mc-chg down" id="mc-oil">-1.42%</div><div class="spark" id="sp-oil"></div></div>
-    <div class="mc"><div class="mc-icon">🥇</div><div class="mc-name">ORO</div><div class="mc-price" id="m-gold">2,338</div><div class="mc-chg up" id="mc-gold">+0.71%</div><div class="spark" id="sp-gold"></div></div>
-    <div class="mc"><div class="mc-icon">📈</div><div class="mc-name">S&P 500</div><div class="mc-price" id="m-sp">5,072</div><div class="mc-chg down" id="mc-sp">-0.28%</div><div class="spark" id="sp-sp"></div></div>
+    <div class="mc">
+      <div class="mc-top"><div class="mc-coin" style="background:rgba(247,147,26,0.15)">₿</div><div class="mc-name">BTC / USD</div></div>
+      <div class="mc-price" id="m-btc">63,245.10</div>
+      <div class="mc-chg up" id="mc-btc">+2.35%</div>
+      <div class="mc-graph" id="g-btc"></div>
+    </div>
+    <div class="mc">
+      <div class="mc-top"><div class="mc-coin" style="background:rgba(100,100,100,0.15)">🛢</div><div class="mc-name">PETRÓLEO (WTI)</div></div>
+      <div class="mc-price" id="m-oil">82.45</div>
+      <div class="mc-chg down" id="mc-oil">-1.42%</div>
+      <div class="mc-graph" id="g-oil"></div>
+    </div>
+    <div class="mc">
+      <div class="mc-top"><div class="mc-coin" style="background:rgba(255,215,0,0.15)">🥇</div><div class="mc-name">ORO</div></div>
+      <div class="mc-price" id="m-gold">2,338.70</div>
+      <div class="mc-chg up" id="mc-gold">+0.71%</div>
+      <div class="mc-graph" id="g-gold"></div>
+    </div>
+    <div class="mc">
+      <div class="mc-top"><div class="mc-coin" style="background:rgba(59,130,246,0.15)">📊</div><div class="mc-name">S&P 500</div></div>
+      <div class="mc-price" id="m-sp">5,072.33</div>
+      <div class="mc-chg down" id="mc-sp">-0.28%</div>
+      <div class="mc-graph" id="g-sp"></div>
+    </div>
   </div>
 </div>
 
+<!-- BOTTOM NAV -->
 <div id="bnav">
-  <div class="bni active" onclick="showHome()"><div class="bni-icon">🌍</div><div class="bni-lbl">MAPA</div></div>
-  <div class="bni" onclick="openPage('trends-page')"><div class="bni-icon">📈</div><div class="bni-lbl">TRENDS</div></div>
-  <div id="bnav-ctr"><div id="bnav-fab" onclick="openModal()">🎯</div></div>
-  <div class="bni" onclick="openPage('alerts-page')"><div class="bni-icon">🔔</div><div class="bni-lbl">ALERTAS</div></div>
-  <div class="bni" onclick="openPage('saved-page')"><div class="bni-icon">🔖</div><div class="bni-lbl">SAVED</div></div>
+  <div class="bni active" onclick="showHome()">
+    <div class="bni-av">👤</div>
+    <div class="bni-lbl">Orvex</div>
+  </div>
+  <div class="bni" onclick="openPage('trends-page')">
+    <div class="bni-ic">📈</div>
+    <div class="bni-lbl">Tendencias</div>
+  </div>
+  <div id="bnav-fab-wrap"><div id="bnav-fab" onclick="openModal()">⊛</div></div>
+  <div class="bni" onclick="openPage('alerts-page')">
+    <div class="bni-ic">🔔</div>
+    <div class="bni-lbl">Alertas</div>
+  </div>
+  <div class="bni" onclick="openPage('saved-page')">
+    <div class="bni-ic">🔖</div>
+    <div class="bni-lbl">Guardados</div>
+  </div>
 </div>
 
 <!-- SIDE MENU -->
@@ -249,11 +321,10 @@ body{font-family:'Syne',sans-serif;color:#fff;display:flex;flex-direction:column
   <div id="smenu-hdr"><div id="smenu-logo">ORVEX</div><div id="smenu-tag">SEE THE WORLD FIRST</div></div>
   <div class="smi" onclick="closeMenu();showHome()"><span class="smi-ic">🌍</span>Mapa Mundial</div>
   <div class="smi" onclick="closeMenu();openPage('trends-page')"><span class="smi-ic">📈</span>Tendencias</div>
-  <div class="smi" onclick="closeMenu();openPage('alerts-page')"><span class="smi-ic">🔔</span>Alertas<span class="smi-badge">3</span></div>
+  <div class="smi" onclick="closeMenu();openPage('alerts-page')"><span class="smi-ic">🔔</span>Alertas</div>
   <div class="smi" onclick="closeMenu();openPage('saved-page')"><span class="smi-ic">🔖</span>Guardados</div>
   <div class="smi-div"></div>
   <div class="smi" onclick="closeMenu();openPage('settings-page')"><span class="smi-ic">⚙️</span>Configuración</div>
-  <div class="smi" onclick="toggleDark()"><span class="smi-ic">🌙</span>Modo Oscuro</div>
   <div class="smi" onclick="closeMenu();shareApp()"><span class="smi-ic">📤</span>Compartir App</div>
   <div class="smi-div"></div>
   <div class="smi"><span class="smi-ic">💬</span>Feedback</div>
@@ -261,86 +332,69 @@ body{font-family:'Syne',sans-serif;color:#fff;display:flex;flex-direction:column
   <div id="smenu-ver">ORVEX v1.0.0 · orvex-chi.vercel.app</div>
 </div>
 
-<!-- TRENDS PAGE -->
+<!-- PAGES -->
 <div class="page" id="trends-page">
-  <div class="page-hdr"><div class="page-back" onclick="closePage('trends-page')">←</div><div class="page-title">TENDENCIAS</div></div>
-  <div class="page-body">
-    <div class="page-card">
-      <h3>🔥 MÁS VISTOS HOY</h3>
-      <div class="trend-item"><span class="trend-num">1</span><span class="trend-title">Conflicto en Ucrania</span><span class="trend-count">142K</span></div>
-      <div class="trend-item"><span class="trend-num">2</span><span class="trend-title">Mercados Asia</span><span class="trend-count">89K</span></div>
-      <div class="trend-item"><span class="trend-num">3</span><span class="trend-title">IA y tecnología</span><span class="trend-count">76K</span></div>
-      <div class="trend-item"><span class="trend-num">4</span><span class="trend-title">Champions League</span><span class="trend-count">61K</span></div>
-      <div class="trend-item"><span class="trend-num">5</span><span class="trend-title">Bitcoin récord</span><span class="trend-count">54K</span></div>
+  <div class="ph"><div class="pb" onclick="closePage('trends-page')">←</div><div class="pt">TENDENCIAS</div></div>
+  <div class="pbody">
+    <div class="pc"><h3>🔥 MÁS VISTOS HOY</h3>
+      <div class="ti"><span class="tn">1</span><span class="tt">Conflicto en Ucrania</span><span class="tc">142K</span></div>
+      <div class="ti"><span class="tn">2</span><span class="tt">Mercados en Asia</span><span class="tc">89K</span></div>
+      <div class="ti"><span class="tn">3</span><span class="tt">IA y tecnología</span><span class="tc">76K</span></div>
+      <div class="ti"><span class="tn">4</span><span class="tt">Champions League</span><span class="tc">61K</span></div>
+      <div class="ti"><span class="tn">5</span><span class="tt">Bitcoin récord</span><span class="tc">54K</span></div>
     </div>
-    <div class="page-card">
-      <h3>💹 MERCADOS EXTENDIDOS</h3>
-      <div class="trend-item"><span class="trend-num">₿</span><span class="trend-title">Bitcoin (BTC)</span><span class="trend-count" id="t-btc">$63,245</span></div>
-      <div class="trend-item"><span class="trend-num">Ξ</span><span class="trend-title">Ethereum (ETH)</span><span class="trend-count" id="t-eth">$3,421</span></div>
-      <div class="trend-item"><span class="trend-num">🛢</span><span class="trend-title">Petróleo WTI</span><span class="trend-count" id="t-oil">$82.45</span></div>
-      <div class="trend-item"><span class="trend-num">🥇</span><span class="trend-title">Oro (XAU)</span><span class="trend-count" id="t-gold">$2,338</span></div>
-      <div class="trend-item"><span class="trend-num">📈</span><span class="trend-title">S&P 500</span><span class="trend-count" id="t-sp">5,072</span></div>
+    <div class="pc"><h3>💹 MERCADOS</h3>
+      <div class="ti"><span class="tn">₿</span><span class="tt">Bitcoin (BTC)</span><span class="tc" id="t-btc">$63,245</span></div>
+      <div class="ti"><span class="tn">Ξ</span><span class="tt">Ethereum (ETH)</span><span class="tc">$3,421</span></div>
+      <div class="ti"><span class="tn">🛢</span><span class="tt">Petróleo WTI</span><span class="tc" id="t-oil">$82.45</span></div>
+      <div class="ti"><span class="tn">🥇</span><span class="tt">Oro (XAU)</span><span class="tc" id="t-gold">$2,338</span></div>
     </div>
   </div>
 </div>
 
-<!-- ALERTS PAGE -->
 <div class="page" id="alerts-page">
-  <div class="page-hdr"><div class="page-back" onclick="closePage('alerts-page')">←</div><div class="page-title">ALERTAS</div></div>
-  <div class="page-body">
-    <div class="page-card">
-      <h3>🔴 URGENTES</h3>
-      <div class="alert-item"><div class="alert-dot" style="background:#ff2d55"></div><div class="alert-body"><div class="alert-title">Explosiones reportadas en Kiev</div><div class="alert-time">Hace 2 min · Ucrania</div></div></div>
-      <div class="alert-item"><div class="alert-dot" style="background:#ff2d55"></div><div class="alert-body"><div class="alert-title">Tensión militar elevada en Irán</div><div class="alert-time">Hace 15 min · Irán</div></div></div>
-      <div class="alert-item"><div class="alert-dot" style="background:#ff9f0a"></div><div class="alert-body"><div class="alert-title">Caída del mercado bursátil japonés</div><div class="alert-time">Hace 7 min · Japón</div></div></div>
+  <div class="ph"><div class="pb" onclick="closePage('alerts-page')">←</div><div class="pt">ALERTAS</div></div>
+  <div class="pbody">
+    <div class="pc"><h3>🔴 URGENTES</h3>
+      <div class="ai"><div class="ad" style="background:#ff3c3c"></div><div class="ab"><div class="at">Explosiones reportadas en Kiev</div><div class="am">Hace 2 min · Ucrania</div></div></div>
+      <div class="ai"><div class="ad" style="background:#ff3c3c"></div><div class="ab"><div class="at">Tensión militar elevada en Irán</div><div class="am">Hace 15 min · Irán</div></div></div>
+      <div class="ai"><div class="ad" style="background:#ff9f0a"></div><div class="ab"><div class="at">Caída del mercado bursátil japonés</div><div class="am">Hace 7 min · Japón</div></div></div>
     </div>
-    <div class="page-card">
-      <h3>⚙️ CONFIGURAR ALERTAS</h3>
-      <div class="toggle-row"><span class="toggle-label">Conflictos globales</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><span class="toggle-label">Mercados financieros</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><span class="toggle-label">Tecnología y ciencia</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><span class="toggle-label">Deportes</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <div class="pc"><h3>⚙️ CONFIGURAR</h3>
+      <div class="tr"><span class="tl">Conflictos globales</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="tr"><span class="tl">Mercados financieros</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="tr"><span class="tl">Tecnología</span><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+      <div class="tr"><span class="tl">Deportes</span><div class="tog" onclick="this.classList.toggle('on')"></div></div>
     </div>
   </div>
 </div>
 
-<!-- SAVED PAGE -->
 <div class="page" id="saved-page">
-  <div class="page-hdr"><div class="page-back" onclick="closePage('saved-page')">←</div><div class="page-title">GUARDADOS</div></div>
-  <div class="page-body">
-    <div class="page-card">
-      <h3>🔖 MIS NOTICIAS</h3>
-      <div class="saved-item"><div class="saved-icon" style="background:rgba(255,45,85,0.1)">💥</div><div class="saved-body"><div class="saved-title">Explosiones reportadas en Kiev</div><div class="saved-meta">Reuters · Hace 2 min</div></div></div>
-      <div class="saved-item"><div class="saved-icon" style="background:rgba(10,132,255,0.1)">💻</div><div class="saved-body"><div class="saved-title">Empresa lanza nuevo modelo de IA</div><div class="saved-meta">TechCrunch · Hace 14 min</div></div></div>
-      <div class="saved-item"><div class="saved-icon" style="background:rgba(48,209,88,0.1)">📊</div><div class="saved-body"><div class="saved-title">Bitcoin supera nuevo récord histórico</div><div class="saved-meta">CoinDesk · Hace 1h 35min</div></div></div>
+  <div class="ph"><div class="pb" onclick="closePage('saved-page')">←</div><div class="pt">GUARDADOS</div></div>
+  <div class="pbody">
+    <div class="pc"><h3>🔖 MIS NOTICIAS</h3>
+      <div class="ti"><span class="tn">💥</span><span class="tt">Explosiones reportadas en Kiev</span><span class="tc">Reuters</span></div>
+      <div class="ti"><span class="tn">💻</span><span class="tt">Empresa lanza nuevo modelo de IA</span><span class="tc">TechCrunch</span></div>
+      <div class="ti"><span class="tn">₿</span><span class="tt">Bitcoin supera nuevo récord histórico</span><span class="tc">CoinDesk</span></div>
     </div>
   </div>
 </div>
 
-<!-- SETTINGS PAGE -->
 <div class="page" id="settings-page">
-  <div class="page-hdr"><div class="page-back" onclick="closePage('settings-page')">←</div><div class="page-title">CONFIGURACIÓN</div></div>
-  <div class="page-body">
-    <div class="page-card">
-      <h3>🎨 APARIENCIA</h3>
-      <div class="toggle-row"><span class="toggle-label">Modo Oscuro</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><span class="toggle-label">Animaciones</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><span class="toggle-label">Globo auto-rotación</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+  <div class="ph"><div class="pb" onclick="closePage('settings-page')">←</div><div class="pt">CONFIGURACIÓN</div></div>
+  <div class="pbody">
+    <div class="pc"><h3>🎨 APARIENCIA</h3>
+      <div class="tr"><span class="tl">Modo Oscuro</span><div class="tog on"></div></div>
+      <div class="tr"><span class="tl">Animaciones</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="tr"><span class="tl">Auto-rotación globo</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
     </div>
-    <div class="page-card">
-      <h3>🌍 IDIOMA Y REGIÓN</h3>
-      <div class="toggle-row"><span class="toggle-label">Español</span><div class="toggle on"></div></div>
-      <div class="toggle-row"><span class="toggle-label">Noticias en español</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+    <div class="pc"><h3>🔔 NOTIFICACIONES</h3>
+      <div class="tr"><span class="tl">Push notifications</span><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+      <div class="tr"><span class="tl">Noticias urgentes</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
     </div>
-    <div class="page-card">
-      <h3>🔔 NOTIFICACIONES</h3>
-      <div class="toggle-row"><span class="toggle-label">Push notifications</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-      <div class="toggle-row"><span class="toggle-label">Noticias urgentes</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-    </div>
-    <div class="page-card">
-      <h3>ℹ️ ACERCA DE</h3>
-      <div class="toggle-row"><span class="toggle-label" style="color:rgba(255,255,255,0.4)">Versión</span><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--cyan)">v1.0.0</span></div>
-      <div class="toggle-row"><span class="toggle-label" style="color:rgba(255,255,255,0.4)">Web</span><span style="font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.3)">orvex-chi.vercel.app</span></div>
+    <div class="pc"><h3>ℹ️ ACERCA DE</h3>
+      <div class="tr"><span class="tl" style="color:rgba(255,255,255,0.4)">Versión</span><span style="font-size:12px;color:#00cfff">v1.0.0</span></div>
+      <div class="tr"><span class="tl" style="color:rgba(255,255,255,0.4)">Web</span><span style="font-size:10px;color:rgba(255,255,255,0.3)">orvex-chi.vercel.app</span></div>
     </div>
   </div>
 </div>
@@ -349,78 +403,74 @@ body{font-family:'Syne',sans-serif;color:#fff;display:flex;flex-direction:column
 <div id="modal-wrap">
   <div id="modal">
     <div id="modal-pill"></div>
-    <div id="modal-hdr"><div id="modal-ttl">TODAS LAS NOTICIAS</div><div id="modal-x" onclick="closeModal()">✕</div></div>
-    <div id="modal-body"></div>
+    <div id="mhdr"><div id="mttl">TODAS LAS NOTICIAS</div><div id="mx" onclick="closeModal()">✕</div></div>
+    <div id="mbody"></div>
   </div>
 </div>
-
 <div id="toast"></div>
 
 <script>
-const CAT_COLORS={all:'#fff',world:'#ff2d55',business:'#30d158',technology:'#0a84ff',health:'#bf5af2',science:'#ff9f0a',sports:'#ffd60a'};
-const CAT_ICONS={world:'💥',business:'📊',technology:'💻',health:'💊',science:'🔬',sports:'⚽'};
-const GEO={us:[37.09,-95.71,'EE. UU.'],gb:[55.37,-3.43,'Reino Unido'],de:[51.16,10.45,'Alemania'],fr:[46.22,2.21,'Francia'],jp:[36.20,138.25,'Japón'],cn:[35.86,104.19,'China'],in:[20.59,78.96,'India'],br:[-14.23,-51.92,'Brasil'],ru:[61.52,105.31,'Rusia'],au:[-25.27,133.77,'Australia'],mx:[23.63,-102.55,'México'],es:[40.46,-3.74,'España'],ar:[-38.41,-63.61,'Argentina'],pe:[-9.19,-75.01,'Perú'],za:[-30.55,22.93,'Sudáfrica'],ng:[9.08,8.67,'Nigeria'],eg:[26.82,30.80,'Egipto'],kr:[35.90,127.76,'Corea del Sur'],ae:[23.42,53.84,'Emiratos'],ua:[48.37,31.16,'Ucrania'],ir:[32.42,53.68,'Irán']};
+const CAT_COLORS={all:'#fff',world:'#ff3c3c',politics:'#a855f7',business:'#22c55e',technology:'#00b4ff',science:'#ff9f0a',health:'#22c55e',sports:'#ffd60a'};
+const CAT_ICONS={world:'💥',politics:'🏛️',business:'📊',technology:'💻',science:'⚠️',health:'💊',sports:'⚽'};
+const GEO={us:[37,-95,'EE. UU.'],gb:[55,-3,'Reino Unido'],de:[51,10,'Alemania'],fr:[46,2,'Francia'],jp:[36,138,'Japón'],cn:[35,104,'China'],in:[20,78,'India'],br:[-14,-51,'Brasil'],ru:[61,105,'Rusia'],au:[-25,133,'Australia'],mx:[23,-102,'México'],es:[40,-3,'España'],ar:[-38,-63,'Argentina'],pe:[-9,-75,'Perú'],za:[-30,22,'Sudáfrica'],ng:[9,8,'Nigeria'],eg:[26,30,'Egipto'],kr:[35,127,'Corea del Sur'],ae:[23,53,'Emiratos'],ua:[48,31,'Ucrania'],ir:[32,53,'Irán']};
 const FALLBACK=[
-  {title:'Explosiones reportadas en el centro de Kiev',src:'Reuters',cat:'world',cc:'ua',t:'Hace 2 min',urg:true},
-  {title:'Tensión militar elevada en la región persa',src:'Al Jazeera',cat:'world',cc:'ir',t:'Hace 15 min'},
-  {title:'Caída del mercado bursátil japonés más del 3%',src:'Bloomberg',cat:'business',cc:'jp',t:'Hace 7 min'},
-  {title:'Protestas masivas en São Paulo, Brasil',src:'BBC World',cat:'world',cc:'br',t:'Hace 32 min'},
-  {title:'La oposición lidera primeros resultados en Sudáfrica',src:'CNN',cat:'world',cc:'za',t:'Hace 11 min'},
-  {title:'Empresa de EE. UU. lanza nuevo modelo de IA',src:'TechCrunch',cat:'technology',cc:'us',t:'Hace 14 min'},
-  {title:'Nuevo tratamiento contra el cáncer logra resultados históricos',src:'Lancet',cat:'health',cc:'gb',t:'Hace 28 min'},
-  {title:'Acuerdo comercial firmado entre bloques económicos',src:'FT',cat:'business',cc:'de',t:'Hace 41 min'},
-  {title:'SpaceX lanza misión tripulada a la estación espacial',src:'Space.com',cat:'science',cc:'us',t:'Hace 55 min'},
-  {title:'Champions League: clasificados a cuartos de final',src:'ESPN',cat:'sports',cc:'es',t:'Hace 1h 2min'},
-  {title:'Terremoto de magnitud 5.8 sacude costa del Pacífico',src:'USGS',cat:'world',cc:'pe',t:'Hace 1h 20min'},
-  {title:'Bitcoin supera nuevo récord histórico global',src:'CoinDesk',cat:'business',cc:'us',t:'Hace 1h 35min'},
+  {title:'Explosiones reportadas en el centro de Kiev',desc:'Varias explosiones en el centro de la ciudad.',src:'Reuters',cat:'world',cc:'ua',t:'Hace 2 min',urg:true},
+  {title:'Caída del mercado bursátil en Japón',desc:'El índice Nikkei cae más de un 3%.',src:'Bloomberg',cat:'business',cc:'jp',t:'Hace 7 min'},
+  {title:'Elecciones en Sudáfrica',desc:'La oposición lidera los primeros resultados.',src:'CNN',cat:'politics',cc:'za',t:'Hace 11 min'},
+  {title:'Nuevo avance en IA',desc:'Empresa de EE. UU. lanza nuevo modelo.',src:'TechCrunch',cat:'technology',cc:'us',t:'Hace 14 min'},
+  {title:'Protestas masivas en São Paulo',desc:'Miles salen a las calles en todo Brasil.',src:'BBC World',cat:'world',cc:'br',t:'Hace 32 min'},
+  {title:'Tensión militar elevada en Irán',desc:'Alertas de nivel máximo en la región.',src:'Al Jazeera',cat:'world',cc:'ir',t:'Hace 15 min'},
+  {title:'Nuevo tratamiento contra el cáncer',desc:'Resultados históricos en ensayos clínicos.',src:'Lancet',cat:'health',cc:'gb',t:'Hace 28 min'},
+  {title:'SpaceX lanza misión tripulada',desc:'Misión a la estación espacial internacional.',src:'Space.com',cat:'science',cc:'us',t:'Hace 55 min'},
+  {title:'Champions League: cuartos de final',desc:'Equipos clasificados esta semana.',src:'ESPN',cat:'sports',cc:'es',t:'Hace 1h'},
+  {title:'Bitcoin supera récord histórico',desc:'La criptomoneda alcanza nuevo máximo.',src:'CoinDesk',cat:'business',cc:'us',t:'Hace 1h 35min'},
+  {title:'Terremoto 5.8 en costa del Pacífico',desc:'Sin víctimas por el momento.',src:'USGS',cat:'science',cc:'pe',t:'Hace 1h 20min'},
+  {title:'Acuerdo comercial entre bloques económicos',desc:'Nuevo pacto entre Asia y Europa.',src:'FT',cat:'business',cc:'de',t:'Hace 41min'},
 ];
 const RSS=[
   {url:'https://feeds.bbci.co.uk/news/world/rss.xml',src:'BBC World',cat:'world',cc:'gb'},
   {url:'https://feeds.bbci.co.uk/news/technology/rss.xml',src:'BBC Tech',cat:'technology',cc:'gb'},
   {url:'https://feeds.bbci.co.uk/news/business/rss.xml',src:'BBC Business',cat:'business',cc:'gb'},
   {url:'https://feeds.bbci.co.uk/news/health/rss.xml',src:'BBC Health',cat:'health',cc:'gb'},
-  {url:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml',src:'BBC Science',cat:'science',cc:'gb'},
   {url:'https://feeds.bbci.co.uk/sport/rss.xml',src:'BBC Sport',cat:'sports',cc:'gb'},
   {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',src:'NY Times',cat:'world',cc:'us'},
   {url:'https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml',src:'NY Times Tech',cat:'technology',cc:'us'},
 ];
 
 let allNews=[...FALLBACK],activeFilter='all';
-let rotX=0,rotY=0,prevX=0,prevY=0,isDragging=false,globeScale=95;
+let rotX=0,rotY=20,prevX=0,prevY=0,isDragging=false;
 let proj,pathFn,dotsG,countryPaths,gratPath;
-
-// HERO
-function drawHero(){
-  const c=document.getElementById('hero-canvas'),ctx=c.getContext('2d');
-  c.width=window.innerWidth*devicePixelRatio;c.height=88*devicePixelRatio;
-  ctx.scale(devicePixelRatio,devicePixelRatio);
-  const cols=['#ff2d55','#bf5af2','#30d158','#ff9f0a','#0a84ff','#ffd60a','#64d2ff'];
-  for(let i=0;i<200;i++){
-    ctx.beginPath();ctx.arc(Math.random()*window.innerWidth,Math.random()*88,Math.random()*1.3+0.2,0,Math.PI*2);
-    ctx.fillStyle=cols[i%cols.length];ctx.globalAlpha=0.15+Math.random()*0.45;ctx.fill();
-  }
-  ctx.globalAlpha=1;
-}
 
 // GLOBE
 async function initGlobe(){
   const svg=d3.select('#globe-svg');
-  const W=200,H=200;
-  proj=d3.geoOrthographic().scale(globeScale).translate([W/2,H/2]).clipAngle(90).rotate([rotY,-rotX]);
+  const W=280,H=280,R=128;
+  proj=d3.geoOrthographic().scale(R).translate([W/2,H/2]).clipAngle(90).rotate([rotY,-rotX]);
   pathFn=d3.geoPath().projection(proj);
 
-  svg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',globeScale).attr('id','globe-bg')
-    .attr('fill','#010d1e').attr('stroke','rgba(0,180,255,0.2)').attr('stroke-width',1.2);
+  // Ocean
+  svg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',R).attr('id','g-bg')
+    .attr('fill','url(#oceanGrad)');
 
   const defs=svg.append('defs');
-  const f=defs.append('filter').attr('id','glow');
-  f.append('feGaussianBlur').attr('stdDeviation','2.5').attr('result','blur');
-  const fm=f.append('feMerge');
-  fm.append('feMergeNode').attr('in','blur');
-  fm.append('feMergeNode').attr('in','SourceGraphic');
+  // Ocean gradient - dark blue like satellite night photo
+  const og=defs.append('radialGradient').attr('id','oceanGrad').attr('cx','40%').attr('cy','40%');
+  og.append('stop').attr('offset','0%').attr('stop-color','#0a1628');
+  og.append('stop').attr('offset','60%').attr('stop-color','#050d1a');
+  og.append('stop').attr('offset','100%').attr('stop-color','#020810');
 
-  gratPath=svg.append('path').datum(d3.geoGraticule()()).attr('fill','none').attr('stroke','rgba(0,180,255,0.06)').attr('stroke-width',0.3).attr('d',pathFn);
+  // Glow filter
+  const gf=defs.append('filter').attr('id','dotGlow');
+  gf.append('feGaussianBlur').attr('stdDeviation','2').attr('result','blur');
+  const gfm=gf.append('feMerge');
+  gfm.append('feMergeNode').attr('in','blur');
+  gfm.append('feMergeNode').attr('in','SourceGraphic');
 
+  // Graticule
+  gratPath=svg.append('path').datum(d3.geoGraticule()()).attr('fill','none')
+    .attr('stroke','rgba(0,180,255,0.07)').attr('stroke-width',0.4).attr('d',pathFn);
+
+  // Countries
   try{
     const res=await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
     const world=await res.json();
@@ -428,14 +478,17 @@ async function initGlobe(){
     const countries=feature(world,world.objects.countries);
     countryPaths=svg.append('g').selectAll('path')
       .data(countries.features).enter().append('path')
-      .attr('fill','#0a1628').attr('stroke','rgba(0,160,255,0.3)').attr('stroke-width',0.4)
-      .attr('d',pathFn).style('cursor','pointer')
-      .on('mouseover',function(){d3.select(this).attr('fill','#0d2545');})
-      .on('mouseout',function(){d3.select(this).attr('fill','#0a1628');});
+      .attr('fill','#0d2040')
+      .attr('stroke','rgba(0,140,255,0.35)').attr('stroke-width',0.5)
+      .attr('d',pathFn);
   }catch(e){}
 
-  svg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',globeScale).attr('id','globe-outline')
-    .attr('fill','none').attr('stroke','rgba(0,180,255,0.2)').attr('stroke-width',1.5);
+  // Globe border glow
+  svg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',R)
+    .attr('fill','none').attr('stroke','rgba(0,180,255,0.25)').attr('stroke-width',1.5);
+  // Atmosphere glow
+  svg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',R+4)
+    .attr('fill','none').attr('stroke','rgba(0,120,255,0.08)').attr('stroke-width',6);
 
   dotsG=svg.append('g').attr('id','dots-g');
   updateGlobe();
@@ -444,24 +497,13 @@ async function initGlobe(){
   const el=document.getElementById('globe-svg');
   el.addEventListener('mousedown',e=>{isDragging=true;prevX=e.clientX;prevY=e.clientY;});
   el.addEventListener('touchstart',e=>{isDragging=true;prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
-  window.addEventListener('mousemove',e=>{if(!isDragging)return;rotY+=(e.clientX-prevX)*0.35;rotX+=(e.clientY-prevY)*0.35;prevX=e.clientX;prevY=e.clientY;updateGlobe();});
-  window.addEventListener('touchmove',e=>{if(!isDragging)return;rotY+=(e.touches[0].clientX-prevX)*0.35;rotX+=(e.touches[0].clientY-prevY)*0.35;prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;updateGlobe();},{passive:true});
+  window.addEventListener('mousemove',e=>{if(!isDragging)return;rotY+=(e.clientX-prevX)*0.4;rotX+=(e.clientY-prevY)*0.4;prevX=e.clientX;prevY=e.clientY;updateGlobe();});
+  window.addEventListener('touchmove',e=>{if(!isDragging)return;rotY+=(e.touches[0].clientX-prevX)*0.4;rotX+=(e.touches[0].clientY-prevY)*0.4;prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;updateGlobe();},{passive:true});
   window.addEventListener('mouseup',()=>isDragging=false);
   window.addEventListener('touchend',()=>isDragging=false);
 
-  // Zoom
-  document.getElementById('zoom-in').onclick=()=>{globeScale=Math.min(globeScale+10,160);applyZoom();};
-  document.getElementById('zoom-out').onclick=()=>{globeScale=Math.max(globeScale-10,55);applyZoom();};
-
   // Auto rotate
-  setInterval(()=>{if(!isDragging){rotY+=0.12;updateGlobe();}},30);
-}
-
-function applyZoom(){
-  proj.scale(globeScale);
-  d3.select('#globe-bg').attr('r',globeScale);
-  d3.select('#globe-outline').attr('r',globeScale);
-  updateGlobe();
+  setInterval(()=>{if(!isDragging){rotY+=0.1;updateGlobe();}},30);
 }
 
 function updateGlobe(){
@@ -476,43 +518,32 @@ function updateGlobe(){
 function updateDots(){
   if(!dotsG)return;
   dotsG.selectAll('*').remove();
-  const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
-  const tt=document.getElementById('globe-tooltip');
-  filtered.forEach((n,i)=>{
+  const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter||n.cat==='politics'&&activeFilter==='world');
+  filtered.slice(0,20).forEach((n,i)=>{
     const g=GEO[n.cc]||GEO.us;
-    const lat=g[0]+(Math.random()-0.5)*2.5;
-    const lng=g[1]+(Math.random()-0.5)*2.5;
+    const lat=g[0]+(Math.random()-0.5)*3;
+    const lng=g[1]+(Math.random()-0.5)*3;
     const p=proj([lng,lat]);
     if(!p)return;
-    const vis=d3.geoDistance([lng,lat],proj.invert([100,100]))<Math.PI/2;
+    const vis=d3.geoDistance([lng,lat],proj.invert([140,140]))<Math.PI/2;
     if(!vis)return;
     const col=CAT_COLORS[n.cat]||'#fff';
-
-    dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3).attr('fill','none')
-      .attr('stroke',col).attr('stroke-width',1).attr('opacity',0.25)
-      .append('animate').attr('attributeName','r').attr('from',3).attr('to',11)
-      .attr('dur',(1.6+i*0.05%0.8)+'s').attr('repeatCount','indefinite');
-    dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3).attr('fill','none')
-      .attr('stroke',col).attr('stroke-width',0.8).attr('opacity',0.12)
-      .append('animate').attr('attributeName','opacity').attr('from',0.12).attr('to',0)
-      .attr('dur',(1.6+i*0.05%0.8)+'s').attr('repeatCount','indefinite');
-
-    const dot=dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3.8)
-      .attr('fill',col).attr('stroke','rgba(255,255,255,0.85)').attr('stroke-width',0.7)
-      .attr('filter','url(#glow)').style('cursor','pointer');
-
-    dot.on('mouseover',function(event){
-      document.getElementById('tt-loc').textContent=g[2];
-      document.getElementById('tt-title').textContent=n.title.slice(0,55)+'...';
-      document.getElementById('tt-time').textContent=n.src+' · '+n.t;
-      tt.style.display='block';
-      tt.style.left=Math.min(p[0]+10,160)+'px';
-      tt.style.top=Math.max(p[1]-40,0)+'px';
-    }).on('mouseout',()=>tt.style.display='none')
-    .on('click',()=>{
-      tt.style.display='none';
-      document.getElementById('news-'+i)?.scrollIntoView({behavior:'smooth',block:'nearest'});
-    });
+    // Rings
+    for(let r=0;r<2;r++){
+      dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3+r*2).attr('fill','none')
+        .attr('stroke',col).attr('stroke-width',r===0?1:0.6).attr('opacity',r===0?0.4:0.2)
+        .append('animate').attr('attributeName','r').attr('from',3+r*2).attr('to',12+r*4)
+        .attr('dur',(1.8+i*0.07%0.9)+'s').attr('begin',(r*0.3)+'s').attr('repeatCount','indefinite');
+      dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3+r*2).attr('fill','none')
+        .attr('stroke',col).attr('stroke-width',0.5).attr('opacity',0.1)
+        .append('animate').attr('attributeName','opacity').attr('from',0.1).attr('to',0)
+        .attr('dur',(1.8+i*0.07%0.9)+'s').attr('begin',(r*0.3)+'s').attr('repeatCount','indefinite');
+    }
+    // Core
+    dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',4.5)
+      .attr('fill',col).attr('stroke','rgba(255,255,255,0.9)').attr('stroke-width',0.8)
+      .attr('filter','url(#dotGlow)').style('cursor','pointer')
+      .on('click',()=>document.getElementById('news-'+i)?.scrollIntoView({behavior:'smooth',block:'nearest'}));
   });
 }
 
@@ -520,14 +551,26 @@ function updateDots(){
 function getCountryName(cc){return GEO[cc]?GEO[cc][2]:'Mundial';}
 function timeAgo(d){
   try{const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);
-  if(m<1)return'AHORA';if(m<60)return'Hace '+m+' min';
-  const h=Math.floor(m/60);return h<24?'Hace '+h+'h':'Hace '+Math.floor(h/24)+'d';}catch(e){return'RECIENTE';}
+  if(m<1)return'Ahora';if(m<60)return'Hace '+m+' min';
+  const h=Math.floor(m/60);return h<24?'Hace '+h+'h':'Hace '+Math.floor(h/24)+'d';}catch(e){return'Reciente';}
 }
 
 function makeNI(n,i){
   const col=CAT_COLORS[n.cat]||'#fff';
-  const thumb=n.img?`<img class="ni-thumb" src="${n.img}" onerror="this.style.display='none'" alt=""/>`:`<div class="ni-icon" style="background:${col}15">${CAT_ICONS[n.cat]||'📰'}</div>`;
-  return `${thumb}<div class="ni-body"><div class="ni-top">${n.urg?'<span class="ni-urg">URGENTE</span>':''}<span class="ni-src" style="color:${col}">${n.src}</span></div><div class="ni-title">${n.title.slice(0,75)}${n.title.length>75?'...':''}</div><div class="ni-time">${n.t}</div></div><div class="ni-country">${getCountryName(n.cc)}</div><div class="ni-arr">›</div>`;
+  const thumb=n.img
+    ?`<div class="ni-thumb-wrap"><img class="ni-thumb" src="${n.img}" onerror="this.parentNode.innerHTML='<div class=ni-icon-wrap style=background:${col}18>${CAT_ICONS[n.cat]||'📰'}</div>'" alt=""/><div class="ni-cat-dot" style="background:${col}22">${CAT_ICONS[n.cat]||'📰'}</div></div>`
+    :`<div class="ni-icon-wrap" style="background:${col}15">${CAT_ICONS[n.cat]||'📰'}</div>`;
+  return `${thumb}
+  <div class="ni-body">
+    <div class="ni-meta">${n.urg?'<span class="ni-urg">URGENTE</span>':''}<span style="color:${col};font-weight:600;font-size:10px">${n.src}</span></div>
+    <div class="ni-title">${n.title}</div>
+    ${n.desc?`<div class="ni-desc">${n.desc}</div>`:''}
+    <div class="ni-time">${n.t}</div>
+  </div>
+  <div class="ni-right">
+    <div class="ni-country">${getCountryName(n.cc)}</div>
+    <div class="ni-arr">›</div>
+  </div>`;
 }
 
 function renderNews(){
@@ -539,7 +582,7 @@ function renderNews(){
     el.onclick=()=>{document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));el.classList.add('active');};
     list.appendChild(el);
   });
-  const mb=document.getElementById('modal-body');mb.innerHTML='';
+  const mb=document.getElementById('mbody');mb.innerHTML='';
   filtered.forEach((n,i)=>{
     const el=document.createElement('div');el.className='ni';
     el.innerHTML=makeNI(n,i);
@@ -554,8 +597,10 @@ async function fetchRSS(){
     const results=await Promise.allSettled(RSS.map(async f=>{
       const res=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(f.url));
       const data=await res.json();
-      if(data.status==='ok'&&data.items)return data.items.slice(0,5).map(item=>({title:item.title,src:f.src,cat:f.cat,cc:f.cc,url:item.link||'#',img:item.thumbnail||null,t:timeAgo(item.pubDate)}));
-      return[];
+      if(data.status==='ok'&&data.items)return data.items.slice(0,4).map(item=>({
+        title:item.title,desc:item.description?.replace(/<[^>]*>/g,'').slice(0,80)||'',
+        src:f.src,cat:f.cat,cc:f.cc,url:item.link,img:item.thumbnail||null,t:timeAgo(item.pubDate)
+      }));return[];
     }));
     const fetched=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
     if(fetched.length>3)allNews=fetched;
@@ -564,55 +609,68 @@ async function fetchRSS(){
   renderNews();
 }
 
-// UI
-function openMenu(){document.getElementById('overlay').classList.add('on');document.getElementById('smenu').classList.add('on');}
-function closeMenu(){document.getElementById('overlay').classList.remove('on');document.getElementById('smenu').classList.remove('on');}
-function openModal(){document.getElementById('modal-wrap').classList.add('on');}
-function closeModal(){document.getElementById('modal-wrap').classList.remove('on');}
-function openPage(id){document.getElementById(id).classList.add('on');document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));}
-function closePage(id){document.getElementById(id).classList.remove('on');}
-function showHome(){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));document.querySelector('.bni').classList.add('active');}
-function shareApp(){
-  if(navigator.share){navigator.share({title:'ORVEX',text:'El mundo en tiempo real',url:'https://orvex-chi.vercel.app/'}).catch(()=>{});}
-  else{navigator.clipboard.writeText('https://orvex-chi.vercel.app/').then(()=>showToast('✅ Link copiado al portapapeles'));closeMenu();}
-}
-function toggleDark(){closeMenu();}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-
-document.getElementById('menu-btn').onclick=openMenu;
-document.getElementById('overlay').onclick=e=>{if(e.target===document.getElementById('overlay'))closeMenu();};
-document.getElementById('modal-wrap').onclick=e=>{if(e.target===document.getElementById('modal-wrap'))closeModal();};
-
-document.querySelectorAll('.cat-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeFilter=btn.dataset.cat;renderNews();});
+// CATEGORIES
+document.querySelectorAll('.cat-item').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.cat-item').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');activeFilter=btn.dataset.cat;renderNews();
+  });
 });
 
 // MARKETS
-function initSparks(){
-  [['btc',true],['oil',false],['gold',true],['sp',false]].forEach(([id,up])=>{
-    const el=document.getElementById('sp-'+id);if(!el)return;
-    for(let i=0;i<7;i++){const b=document.createElement('div');b.className='sb';b.style.height=(4+Math.random()*9)+'px';b.style.background=up?'var(--green)':'var(--red)';el.appendChild(b);}
+function initGraphs(){
+  [['g-btc',true],['g-oil',false],['g-gold',true],['g-sp',false]].forEach(([id,up])=>{
+    const el=document.getElementById(id);if(!el)return;
+    const vals=Array.from({length:10},()=>Math.random());
+    const max=Math.max(...vals),min=Math.min(...vals);
+    vals.forEach(v=>{
+      const b=document.createElement('div');b.className='mg-bar '+(up?'mg-up':'mg-down');
+      b.style.height=((v-min)/(max-min)*18+4)+'px';
+      el.appendChild(b);
+    });
   });
 }
+
 function animateMarkets(){
-  const m=[{id:'m-btc',cid:'mc-btc',tid:'t-btc',base:63245,dec:0},{id:'m-oil',cid:'mc-oil',tid:'t-oil',base:82.45,dec:2},{id:'m-gold',cid:'mc-gold',tid:'t-gold',base:2338,dec:0},{id:'m-sp',cid:'mc-sp',tid:'t-sp',base:5072,dec:0}];
+  const m=[
+    {id:'m-btc',cid:'mc-btc',tid:'t-btc',base:63245.1,dec:2},
+    {id:'m-oil',cid:'mc-oil',tid:'t-oil',base:82.45,dec:2},
+    {id:'m-gold',cid:'mc-gold',tid:'t-gold',base:2338.7,dec:2},
+    {id:'m-sp',cid:'mc-sp',base:5072.33,dec:2},
+  ];
   setInterval(()=>{
     m.forEach(mk=>{
       const chg=(Math.random()-0.48)*0.3;mk.base*=(1+chg/100);
-      const v=mk.dec?mk.base.toFixed(mk.dec):Math.round(mk.base).toLocaleString();
-      const el=document.getElementById(mk.id),cel=document.getElementById(mk.cid),tel=document.getElementById(mk.tid);
-      if(el)el.textContent=v;if(tel)tel.textContent='$'+v;
+      const v=mk.base.toFixed(mk.dec);
+      const el=document.getElementById(mk.id),cel=document.getElementById(mk.cid),tel=mk.tid?document.getElementById(mk.tid):null;
+      if(el)el.textContent=parseFloat(v)>999?parseFloat(v).toLocaleString('es',{minimumFractionDigits:2,maximumFractionDigits:2}):v;
+      if(tel)tel.textContent='$'+v;
       if(cel){cel.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';cel.className='mc-chg '+(chg>=0?'up':'down');}
     });
   },3000);
 }
+
 function animateCount(){let c=14021;setInterval(()=>{c+=Math.floor(Math.random()*8-2);document.getElementById('act-num').textContent=c.toLocaleString();},2500);}
 
+// UI
+function openMenu(){document.getElementById('overlay').classList.add('on');document.getElementById('smenu').classList.add('on');}
+function closeMenu(){document.getElementById('overlay').classList.remove('on');document.getElementById('smenu').classList.remove('on');}
+function openModal(){renderNews();document.getElementById('modal-wrap').classList.add('on');}
+function closeModal(){document.getElementById('modal-wrap').classList.remove('on');}
+function openPage(id){document.getElementById(id).classList.add('on');}
+function closePage(id){document.getElementById(id).classList.remove('on');}
+function showHome(){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));document.querySelector('.bni').classList.add('active');}
+function shareApp(){if(navigator.share)navigator.share({title:'ORVEX',url:'https://orvex-chi.vercel.app/'});else{navigator.clipboard?.writeText('https://orvex-chi.vercel.app/').then(()=>{const t=document.getElementById('toast');t.textContent='✅ Link copiado';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);});closeMenu();}}
+
+document.getElementById('menu-btn').onclick=openMenu;
+document.getElementById('overlay').onclick=e=>{if(e.target===document.getElementById('overlay'))closeMenu();};
+document.getElementById('modal-wrap').onclick=e=>{if(e.target===document.getElementById('modal-wrap'))closeModal();};
+document.querySelectorAll('.bni').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));item.classList.add('active');});});
+
 window.addEventListener('load',async()=>{
-  drawHero();initSparks();animateMarkets();animateCount();renderNews();
+  animateCount();initGraphs();animateMarkets();renderNews();
   await initGlobe();fetchRSS();setInterval(fetchRSS,300000);
 });
-window.addEventListener('resize',drawHero);
 </script>
 </body>
 </html>
