@@ -4,70 +4,65 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ORVEX — El Mundo en Tiempo Real</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#000;font-family:'Inter',sans-serif;color:#fff}
-body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:relative;height:100dvh}
+body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;height:100dvh}
 
-/* ═══ HEADER ═══ */
-#hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:#000;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.05)}
+/* HEADER */
+#hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:#000;flex-shrink:0}
 #logo{display:flex;align-items:center;gap:9px}
-#logo-ic{width:33px;height:33px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px;background:rgba(255,255,255,0.04)}
+#logo-ic{width:33px;height:33px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:14px}
 #logo-name{font-size:15px;font-weight:700;letter-spacing:1px}
-#logo-sub{font-size:7px;color:rgba(255,255,255,0.28);display:block;letter-spacing:1.5px;margin-top:1px}
+#logo-sub{font-size:7px;color:rgba(255,255,255,0.28);display:block;letter-spacing:1.5px}
 #live-pill{background:rgba(255,50,50,0.1);border:1px solid rgba(255,50,50,0.35);border-radius:20px;padding:5px 11px;display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#ff3232;letter-spacing:1px}
-#lpulse{width:6px;height:6px;background:#ff3232;border-radius:50%;animation:lpulse 1s infinite}
-@keyframes lpulse{0%,100%{opacity:1;box-shadow:0 0 4px #ff3232}50%{opacity:0.15;box-shadow:none}}
-#hdr-right{display:flex;gap:11px;align-items:center}
-#hdr-right span{font-size:20px;cursor:pointer;opacity:0.75;transition:opacity 0.2s}
-#hdr-right span:hover{opacity:1}
+#lpulse{width:6px;height:6px;background:#ff3232;border-radius:50%;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.1}}
+#hdr-right{display:flex;gap:12px;align-items:center}
+#hdr-right span{font-size:20px;cursor:pointer;opacity:0.75}
 
-/* ═══ HERO ═══ */
-#hero{padding:10px 16px 6px;background:#000;position:relative;flex-shrink:0}
-#hero-title{max-width:62%}
+/* HERO */
+#hero{padding:10px 16px 4px;background:#000;position:relative;flex-shrink:0}
 #ht1{font-size:28px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.5px}
 #ht2{font-size:28px;font-weight:900;line-height:1;white-space:nowrap;background:linear-gradient(90deg,#00d4ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-#ht3{font-size:11px;color:rgba(255,255,255,0.32);margin-top:4px;font-weight:400}
+#ht3{font-size:11px;color:rgba(255,255,255,0.32);margin-top:4px}
 #act-box{position:absolute;top:10px;right:16px;text-align:right}
 #act-lbl{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1.5px}
-#act-num{font-size:26px;font-weight:800;display:block;color:#fff;line-height:1.1}
+#act-num{font-size:25px;font-weight:800;display:block;color:#fff;line-height:1.1}
 #act-delta{font-size:9px;color:#ff4444;display:flex;align-items:center;gap:2px;justify-content:flex-end;margin-top:1px}
 
-/* ═══ GLOBE SECTION ═══ */
-#globe-section{position:relative;background:#000;flex-shrink:0;overflow:hidden;height:310px}
-#globe-svg{position:absolute;left:50%;top:50%;transform:translate(-42%,-50%);cursor:grab;touch-action:none}
-#globe-svg:active{cursor:grabbing}
+/* GLOBE SECTION */
+#globe-section{position:relative;flex-shrink:0;height:300px;overflow:hidden;background:#000}
+#globe-canvas{position:absolute;top:0;left:0;width:100%;height:100%;touch-action:none}
+#globe-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2}
 
-/* Categories LEFT */
-#cats{position:absolute;left:0;top:0;bottom:0;width:105px;display:flex;flex-direction:column;justify-content:center;gap:1px;padding:6px;z-index:5}
-.ci{display:flex;align-items:center;gap:7px;padding:7px 7px;border-radius:10px;cursor:pointer;transition:all 0.2s;opacity:0.45}
+/* Categories */
+#cats{position:absolute;left:0;top:0;bottom:0;width:105px;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:6px;z-index:5}
+.ci{display:flex;align-items:center;gap:7px;padding:7px 7px;border-radius:10px;cursor:pointer;transition:all 0.2s;opacity:0.45;pointer-events:all}
 .ci.active,.ci:hover{opacity:1;background:rgba(255,255,255,0.06)}
-.ci-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:8px}
+.ci-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0}
 .ci-lbl{font-size:11.5px;font-weight:500;color:#fff;white-space:nowrap}
 
 /* Floating popups */
-.fp{position:absolute;background:rgba(6,8,24,0.94);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 11px;z-index:10;pointer-events:none;backdrop-filter:blur(12px);min-width:155px}
+.fp{position:absolute;background:rgba(5,7,20,0.92);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 12px;z-index:10;pointer-events:none;backdrop-filter:blur(12px);min-width:155px;transition:opacity 0.3s}
 .fp-loc{font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;margin-bottom:2px}
-.fp-pulse{width:9px;height:9px;border-radius:50%;flex-shrink:0;animation:fpulse 2.5s ease-in-out infinite}
-@keyframes fpulse{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 currentColor}50%{opacity:0.8;transform:scale(1.1);box-shadow:0 0 6px 3px currentColor}}
+.fp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;animation:dotpulse 2.5s ease-in-out infinite}
+@keyframes dotpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:0.7}}
 .fp-desc{font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:1px}
 .fp-time{font-size:9px;color:rgba(255,255,255,0.25)}
 
-/* Radar btn */
+/* Radar */
 #radar{position:absolute;bottom:10px;right:10px;z-index:10;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;color:#a855f7;letter-spacing:1.5px;cursor:pointer;background:rgba(0,0,0,0.55);border:1.5px solid rgba(168,85,247,0.4);border-radius:25px;padding:7px 12px;backdrop-filter:blur(8px)}
-#radar-ic{width:24px;height:24px;border-radius:50%;border:1.5px solid #a855f7;display:flex;align-items:center;justify-content:center;font-size:11px;animation:radarSpin 4s linear infinite}
-@keyframes radarSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+#radar-ic{width:22px;height:22px;border-radius:50%;border:1.5px solid #a855f7;display:flex;align-items:center;justify-content:center;font-size:10px;animation:spin 4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* ═══ NEWS SECTION ═══ */
+/* NEWS */
 #news-section{flex-shrink:0;background:#000;border-top:1px solid rgba(255,255,255,0.06)}
-#news-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 16px 7px}
-#news-hdr-l{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:0.5px}
-#ndot{width:7px;height:7px;background:#ff3232;border-radius:50%;animation:lpulse 1s infinite}
+#news-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 6px}
+#news-hdr-l{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700}
+#ndot{width:7px;height:7px;background:#ff3232;border-radius:50%;animation:blink 1s infinite}
 #ver-all{font-size:11px;color:rgba(255,255,255,0.35);cursor:pointer;background:none;border:none;font-family:'Inter',sans-serif}
-
-/* News items - exactly 4 */
 #news-list{display:flex;flex-direction:column}
 .ni{display:flex;align-items:center;gap:10px;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer;transition:background 0.15s}
 .ni:last-child{border-bottom:none}
@@ -75,7 +70,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .ni-img{width:62px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;background:rgba(255,255,255,0.07)}
 .ni-box{width:62px;height:48px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px}
 .ni-body{flex:1;min-width:0}
-.ni-top{display:flex;align-items:center;gap:4px;margin-bottom:2px}
+.ni-top{display:flex;align-items:center;gap:4px;margin-bottom:2px;flex-wrap:wrap}
 .ni-urg{font-size:8px;font-weight:700;color:#ff3232;letter-spacing:1px;background:rgba(255,50,50,0.1);padding:1px 5px;border-radius:3px}
 .ni-src{font-size:9px;font-weight:600}
 .ni-title{font-size:12px;font-weight:600;color:#eee;line-height:1.3;margin-bottom:1px}
@@ -84,41 +79,41 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .ni-country{font-size:9px;color:rgba(255,255,255,0.25)}
 .ni-arr{font-size:18px;color:rgba(255,255,255,0.15)}
 
-/* Category filter pills below news */
-#cat-pills{display:flex;gap:6px;padding:7px 16px 8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+/* Category pills */
+#cat-pills{display:flex;gap:5px;padding:6px 16px 7px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;background:#000}
 #cat-pills::-webkit-scrollbar{display:none}
-.cp{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);font-size:10px;font-weight:600;color:rgba(255,255,255,0.5);cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0}
-.cp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.cp.active{color:#fff;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2)}
+.cp{display:flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.03);font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);cursor:pointer;white-space:nowrap;transition:all 0.2s;flex-shrink:0}
+.cp-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.cp.active{color:#fff;background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.18)}
 
-/* ═══ MARKETS ═══ */
-#mkt-section{flex-shrink:0;background:#000;border-top:1px solid rgba(255,255,255,0.06);padding:8px 14px 10px}
+/* MARKETS */
+#mkt-section{flex-shrink:0;background:#000;border-top:1px solid rgba(255,255,255,0.06);padding:8px 13px 10px}
 #mkt-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
 #mkt-lbl{font-size:12px;font-weight:700}
 #mkt-ver{font-size:11px;color:rgba(255,255,255,0.3);cursor:pointer}
-#mkt-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.mc{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:11px;padding:8px 8px 6px;overflow:hidden}
-.mc-top{display:flex;align-items:center;gap:5px;margin-bottom:3px}
-.mc-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
-.mc-name{font-size:8px;color:rgba(255,255,255,0.35);font-weight:500;letter-spacing:0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mc-price{font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mkt-row{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.mc{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:11px;padding:8px 7px 6px}
+.mc-top{display:flex;align-items:center;gap:4px;margin-bottom:3px}
+.mc-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.mc-name{font-size:7.5px;color:rgba(255,255,255,0.32);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-price{font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc-chg{font-size:9px;font-weight:600;margin-top:1px}
-.mc-graph{height:18px;display:flex;align-items:flex-end;gap:1px;margin-top:4px}
+.mc-graph{height:16px;display:flex;align-items:flex-end;gap:1px;margin-top:3px}
 .mg{flex:1;border-radius:1px;min-height:2px;opacity:0.6}
 .up{color:#22c55e}.down{color:#ef4444}
 .mgu{background:#22c55e}.mgd{background:#ef4444}
 
-/* ═══ BOTTOM NAV ═══ */
+/* BOTTOM NAV */
 #bnav{display:flex;background:#080808;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;padding:5px 6px 8px;align-items:center}
 .bni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;opacity:0.28;transition:opacity 0.2s;padding:2px 0}
 .bni.active{opacity:1}
 .bni-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ff9f0a,#ff2d55);display:flex;align-items:center;justify-content:center;font-size:13px}
 .bni-ic{font-size:19px}
-.bni-lbl{font-size:8px;color:rgba(255,255,255,0.45);letter-spacing:0.3px}
+.bni-lbl{font-size:8px;color:rgba(255,255,255,0.45)}
 #bnav-c{flex:0.8;display:flex;justify-content:center;align-items:center}
-#fab{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;margin-top:-14px;box-shadow:0 0 20px rgba(139,92,246,0.4),0 4px 14px rgba(0,0,0,0.5)}
+#fab{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;margin-top:-14px;box-shadow:0 0 20px rgba(139,92,246,0.4)}
 
-/* ═══ SIDE MENU ═══ */
+/* SIDE MENU */
 #overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:500;display:none;backdrop-filter:blur(5px)}
 #overlay.on{display:block}
 #smenu{position:fixed;top:0;right:-295px;width:282px;height:100%;background:#07070e;border-left:1px solid rgba(255,255,255,0.07);z-index:501;transition:right 0.28s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column}
@@ -134,10 +129,10 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .smdiv{height:1px;background:rgba(255,255,255,0.07);margin:4px 0}
 #smver{padding:16px 18px;font-size:9px;color:rgba(255,255,255,0.1);letter-spacing:1px;margin-top:auto}
 
-/* ═══ SUBPAGES ═══ */
+/* PAGES */
 .page{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column;overflow:hidden;max-width:480px;margin:0 auto}
 .page.on{display:flex}
-.ph{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;background:rgba(0,0,0,0.97)}
+.ph{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0}
 .pb{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px}
 .pt{font-size:13px;font-weight:700;letter-spacing:1.5px}
 .pbody{flex:1;overflow-y:auto;padding:13px;scrollbar-width:none}
@@ -160,10 +155,10 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 .tl{font-size:13px;font-weight:500;color:#eee}
 .tog{width:42px;height:23px;border-radius:12px;background:rgba(255,255,255,0.08);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
 .tog.on{background:#22c55e}
-.tog::after{content:'';position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;transition:left 0.2s}
 .tog.on::after{left:21px}
 
-/* ═══ MODAL ═══ */
+/* MODAL */
 #mwrap{position:fixed;inset:0;background:rgba(0,0,0,0.87);z-index:600;display:none;align-items:flex-end;backdrop-filter:blur(8px)}
 #mwrap.on{display:flex}
 #modal{background:#08080f;border-radius:20px 20px 0 0;width:100%;max-height:84vh;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,0.07);border-bottom:none}
@@ -173,7 +168,6 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 #mclose{width:25px;height:25px;border-radius:7px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px}
 #mbody{overflow-y:auto;flex:1;scrollbar-width:none}
 #mbody::-webkit-scrollbar{display:none}
-
 #toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:rgba(8,8,22,0.97);border:1px solid rgba(0,212,255,0.2);border-radius:11px;padding:9px 16px;font-size:12px;color:#fff;z-index:700;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1}
 </style>
@@ -195,11 +189,7 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 
 <!-- HERO -->
 <div id="hero">
-  <div id="hero-title">
-    <div id="ht1">EL MUNDO</div>
-    <div id="ht2">EN TIEMPO REAL</div>
-    <div id="ht3">Explora. Entiende. Anticípate.</div>
-  </div>
+  <div><div id="ht1">EL MUNDO</div><div id="ht2">EN TIEMPO REAL</div><div id="ht3">Explora. Entiende. Anticípate.</div></div>
   <div id="act-box">
     <div id="act-lbl">ACTIVIDAD GLOBAL</div>
     <span id="act-num">14,021</span>
@@ -209,47 +199,36 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 
 <!-- GLOBE -->
 <div id="globe-section">
+  <canvas id="globe-canvas"></canvas>
+
   <!-- Categories left -->
   <div id="cats">
-    <div class="ci active" data-cat="all"><div class="ci-dot" style="background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.4)"></div><span class="ci-lbl">Todos</span></div>
-    <div class="ci" data-cat="world"><div class="ci-dot" style="background:#ff3232"></div><span class="ci-lbl">Conflictos</span></div>
-    <div class="ci" data-cat="politics"><div class="ci-dot" style="background:#a855f7"></div><span class="ci-lbl">Política</span></div>
-    <div class="ci" data-cat="business"><div class="ci-dot" style="background:#22c55e"></div><span class="ci-lbl">Economía</span></div>
+    <div class="ci active" data-cat="all"><div class="ci-dot" style="background:rgba(255,255,255,0.5)"></div><span class="ci-lbl">Todos</span></div>
+    <div class="ci" data-cat="world"><div class="ci-dot" style="background:#ff2d2d"></div><span class="ci-lbl">Conflictos</span></div>
+    <div class="ci" data-cat="politics"><div class="ci-dot" style="background:#9b59ff"></div><span class="ci-lbl">Política</span></div>
+    <div class="ci" data-cat="business"><div class="ci-dot" style="background:#00e87a"></div><span class="ci-lbl">Economía</span></div>
     <div class="ci" data-cat="technology"><div class="ci-dot" style="background:#00b4ff"></div><span class="ci-lbl">Tecnología</span></div>
-    <div class="ci" data-cat="science"><div class="ci-dot" style="background:#ff9f0a"></div><span class="ci-lbl">Desastres</span></div>
-    <div class="ci" data-cat="health"><div class="ci-dot" style="background:#22c55e"></div><span class="ci-lbl">Salud</span></div>
+    <div class="ci" data-cat="science"><div class="ci-dot" style="background:#ff8c00"></div><span class="ci-lbl">Desastres</span></div>
+    <div class="ci" data-cat="health"><div class="ci-dot" style="background:#30d158"></div><span class="ci-lbl">Salud</span></div>
   </div>
 
-  <!-- Globe SVG -->
-  <svg id="globe-svg" width="310" height="310" viewBox="0 0 310 310"></svg>
-
   <!-- Floating popups -->
-  <div class="fp" style="top:16%;right:3%">
-    <div class="fp-loc">
-      <div class="fp-pulse" style="background:#ff3232;color:#ff3232"></div>
-      Kiev, Ucrania
-    </div>
+  <div class="fp" id="fp1" style="top:16%;right:3%">
+    <div class="fp-loc"><div class="fp-dot" style="background:#ff2d2d;box-shadow:0 0 6px #ff2d2d"></div>Kiev, Ucrania</div>
     <div class="fp-desc">Explosiones reportadas</div>
     <div class="fp-time">Hace 2 min</div>
   </div>
-  <div class="fp" style="top:40%;right:3%">
-    <div class="fp-loc">
-      <div class="fp-pulse" style="background:#a855f7;color:#a855f7"></div>
-      Teherán, Irán
-    </div>
+  <div class="fp" id="fp2" style="top:42%;right:3%">
+    <div class="fp-loc"><div class="fp-dot" style="background:#9b59ff;box-shadow:0 0 6px #9b59ff"></div>Teherán, Irán</div>
     <div class="fp-desc">Tensión militar elevada</div>
     <div class="fp-time">Hace 15 min</div>
   </div>
-  <div class="fp" style="bottom:15%;left:32%">
-    <div class="fp-loc">
-      <div class="fp-pulse" style="background:#22c55e;color:#22c55e"></div>
-      São Paulo, Brasil
-    </div>
+  <div class="fp" id="fp3" style="bottom:16%;left:30%">
+    <div class="fp-loc"><div class="fp-dot" style="background:#00e87a;box-shadow:0 0 6px #00e87a"></div>São Paulo, Brasil</div>
     <div class="fp-desc">Protestas masivas</div>
     <div class="fp-time">Hace 32 min</div>
   </div>
 
-  <!-- Radar -->
   <div id="radar"><div id="radar-ic">⊕</div>MODO RADAR</div>
 </div>
 
@@ -265,11 +244,11 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 <!-- CATEGORY PILLS -->
 <div id="cat-pills">
   <div class="cp active" data-cat="all"><span class="cp-dot" style="background:#fff"></span>Todos</div>
-  <div class="cp" data-cat="world"><span class="cp-dot" style="background:#ff3232"></span>Conflictos</div>
-  <div class="cp" data-cat="science"><span class="cp-dot" style="background:#ff9f0a"></span>Desastres</div>
-  <div class="cp" data-cat="politics"><span class="cp-dot" style="background:#a855f7"></span>Política</div>
+  <div class="cp" data-cat="world"><span class="cp-dot" style="background:#ff2d2d"></span>Conflictos</div>
+  <div class="cp" data-cat="science"><span class="cp-dot" style="background:#ff8c00"></span>Desastres</div>
+  <div class="cp" data-cat="politics"><span class="cp-dot" style="background:#9b59ff"></span>Política</div>
   <div class="cp" data-cat="technology"><span class="cp-dot" style="background:#00b4ff"></span>Tecnología</div>
-  <div class="cp" data-cat="health"><span class="cp-dot" style="background:#22c55e"></span>Salud</div>
+  <div class="cp" data-cat="health"><span class="cp-dot" style="background:#30d158"></span>Salud</div>
   <div class="cp" data-cat="sports"><span class="cp-dot" style="background:#ffd60a"></span>Deportes</div>
 </div>
 
@@ -277,30 +256,10 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 <div id="mkt-section">
   <div id="mkt-hdr"><div id="mkt-lbl">MERCADOS EN VIVO</div><div id="mkt-ver" onclick="openPage('trends-page')">Ver todas</div></div>
   <div id="mkt-row">
-    <div class="mc">
-      <div class="mc-top"><div class="mc-icon" style="background:rgba(247,147,26,0.15)">₿</div><div class="mc-name">BTC/USD</div></div>
-      <div class="mc-price" id="m-btc">63,245</div>
-      <div class="mc-chg up" id="mc-btc">+2.35%</div>
-      <div class="mc-graph" id="g-btc"></div>
-    </div>
-    <div class="mc">
-      <div class="mc-top"><div class="mc-icon" style="background:rgba(120,120,140,0.15)">🛢</div><div class="mc-name">PETRÓLEO</div></div>
-      <div class="mc-price" id="m-oil">82.45</div>
-      <div class="mc-chg down" id="mc-oil">-1.42%</div>
-      <div class="mc-graph" id="g-oil"></div>
-    </div>
-    <div class="mc">
-      <div class="mc-top"><div class="mc-icon" style="background:rgba(255,215,0,0.15)">🥇</div><div class="mc-name">ORO</div></div>
-      <div class="mc-price" id="m-gold">2,338</div>
-      <div class="mc-chg up" id="mc-gold">+0.71%</div>
-      <div class="mc-graph" id="g-gold"></div>
-    </div>
-    <div class="mc">
-      <div class="mc-top"><div class="mc-icon" style="background:rgba(192,192,220,0.15)">🥈</div><div class="mc-name">PLATA</div></div>
-      <div class="mc-price" id="m-silver">27.34</div>
-      <div class="mc-chg up" id="mc-silver">+0.55%</div>
-      <div class="mc-graph" id="g-silver"></div>
-    </div>
+    <div class="mc"><div class="mc-top"><div class="mc-icon" style="background:rgba(247,147,26,0.15)">₿</div><div class="mc-name">BTC/USD</div></div><div class="mc-price" id="m-btc">63,245</div><div class="mc-chg up" id="mc-btc">+2.35%</div><div class="mc-graph" id="g-btc"></div></div>
+    <div class="mc"><div class="mc-top"><div class="mc-icon" style="background:rgba(120,120,140,0.15)">🛢</div><div class="mc-name">PETRÓLEO</div></div><div class="mc-price" id="m-oil">82.45</div><div class="mc-chg down" id="mc-oil">-1.42%</div><div class="mc-graph" id="g-oil"></div></div>
+    <div class="mc"><div class="mc-top"><div class="mc-icon" style="background:rgba(255,215,0,0.15)">🥇</div><div class="mc-name">ORO</div></div><div class="mc-price" id="m-gold">2,338</div><div class="mc-chg up" id="mc-gold">+0.71%</div><div class="mc-graph" id="g-gold"></div></div>
+    <div class="mc"><div class="mc-top"><div class="mc-icon" style="background:rgba(192,192,220,0.15)">🥈</div><div class="mc-name">PLATA</div></div><div class="mc-price" id="m-silver">27.34</div><div class="mc-chg up" id="mc-silver">+0.55%</div><div class="mc-graph" id="g-silver"></div></div>
   </div>
 </div>
 
@@ -350,24 +309,21 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
     </div>
   </div>
 </div>
-
 <div class="page" id="alerts-page">
   <div class="ph"><div class="pb" onclick="closePage('alerts-page')">←</div><div class="pt">ALERTAS</div></div>
   <div class="pbody">
     <div class="pc"><h3>🔴 URGENTES</h3>
-      <div class="ai"><div class="ad" style="background:#ff3232"></div><div class="ab"><div class="at">Explosiones reportadas en Kiev</div><div class="am">Hace 2 min · Ucrania</div></div></div>
-      <div class="ai"><div class="ad" style="background:#ff3232"></div><div class="ab"><div class="at">Tensión militar elevada en Irán</div><div class="am">Hace 15 min · Irán</div></div></div>
-      <div class="ai"><div class="ad" style="background:#ff9f0a"></div><div class="ab"><div class="at">Caída del mercado bursátil japonés</div><div class="am">Hace 7 min · Japón</div></div></div>
+      <div class="ai"><div class="ad" style="background:#ff2d2d"></div><div class="ab"><div class="at">Explosiones reportadas en Kiev</div><div class="am">Hace 2 min · Ucrania</div></div></div>
+      <div class="ai"><div class="ad" style="background:#ff2d2d"></div><div class="ab"><div class="at">Tensión militar elevada en Irán</div><div class="am">Hace 15 min · Irán</div></div></div>
+      <div class="ai"><div class="ad" style="background:#ff8c00"></div><div class="ab"><div class="at">Caída del mercado bursátil japonés</div><div class="am">Hace 7 min · Japón</div></div></div>
     </div>
     <div class="pc"><h3>⚙️ CONFIGURAR</h3>
       <div class="tr"><span class="tl">Conflictos globales</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
       <div class="tr"><span class="tl">Mercados financieros</span><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
       <div class="tr"><span class="tl">Tecnología</span><div class="tog" onclick="this.classList.toggle('on')"></div></div>
-      <div class="tr"><span class="tl">Deportes</span><div class="tog" onclick="this.classList.toggle('on')"></div></div>
     </div>
   </div>
 </div>
-
 <div class="page" id="saved-page">
   <div class="ph"><div class="pb" onclick="closePage('saved-page')">←</div><div class="pt">GUARDADOS</div></div>
   <div class="pbody">
@@ -378,7 +334,6 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
     </div>
   </div>
 </div>
-
 <div class="page" id="settings-page">
   <div class="ph"><div class="pb" onclick="closePage('settings-page')">←</div><div class="pt">CONFIGURACIÓN</div></div>
   <div class="pbody">
@@ -392,7 +347,6 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
     </div>
     <div class="pc"><h3>ℹ️ ACERCA DE</h3>
       <div class="tr"><span class="tl" style="color:rgba(255,255,255,0.35)">Versión</span><span style="font-size:12px;color:#00d4ff">v1.0.0</span></div>
-      <div class="tr"><span class="tl" style="color:rgba(255,255,255,0.35)">Web</span><span style="font-size:10px;color:rgba(255,255,255,0.25)">orvex-chi.vercel.app</span></div>
     </div>
   </div>
 </div>
@@ -407,29 +361,15 @@ body{display:flex;flex-direction:column;max-width:480px;margin:0 auto;position:r
 </div>
 <div id="toast"></div>
 
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-// ══════════════════════════
-// CONSTANTS
-// ══════════════════════════
-const CC={all:'#fff',world:'#ff3232',politics:'#a855f7',business:'#22c55e',technology:'#00b4ff',science:'#ff9f0a',health:'#30d158',sports:'#ffd60a'};
+// ══════════════════════
+// DATA
+// ══════════════════════
+const CC={all:'#fff',world:'#ff2d2d',politics:'#9b59ff',business:'#00e87a',technology:'#00b4ff',science:'#ff8c00',health:'#30d158',sports:'#ffd60a'};
 const CI={world:'💥',politics:'🏛️',business:'📊',technology:'💻',science:'⚠️',health:'💊',sports:'⚽'};
-const GEO={
-  us:[37,-95,'EE. UU.'],gb:[55,-3,'Reino Unido'],de:[51,10,'Alemania'],
-  fr:[46,2,'Francia'],jp:[36,138,'Japón'],cn:[35,104,'China'],
-  in:[20,78,'India'],br:[-14,-51,'Brasil'],ru:[61,105,'Rusia'],
-  au:[-25,133,'Australia'],mx:[23,-102,'México'],es:[40,-3,'España'],
-  ar:[-38,-63,'Argentina'],pe:[-9,-75,'Perú'],za:[-30,22,'Sudáfrica'],
-  ng:[9,8,'Nigeria'],eg:[26,30,'Egipto'],kr:[35,127,'Corea del Sur'],
-  ae:[23,53,'Emiratos'],ua:[48,31,'Ucrania'],ir:[32,53,'Irán'],
-  co:[4,-74,'Colombia'],cl:[-35,-71,'Chile'],
-};
-
-// Fixed dots for the 3 popup locations
-const FIXED_DOTS=[
-  {lat:48.5,lng:31,'col':'#ff3232',label:'Kiev'},
-  {lat:35.7,lng:51.4,col:'#a855f7',label:'Teherán'},
-  {lat:-23.5,lng:-46.6,col:'#22c55e',label:'São Paulo'},
-];
+const GEO={us:[37,-95,'EE. UU.'],gb:[55,-3,'Reino Unido'],de:[51,10,'Alemania'],fr:[46,2,'Francia'],jp:[36,138,'Japón'],cn:[35,104,'China'],in:[20,78,'India'],br:[-14,-51,'Brasil'],ru:[61,105,'Rusia'],au:[-25,133,'Australia'],mx:[23,-102,'México'],es:[40,-3,'España'],ar:[-38,-63,'Argentina'],pe:[-9,-75,'Perú'],za:[-30,22,'Sudáfrica'],ng:[9,8,'Nigeria'],eg:[26,30,'Egipto'],kr:[35,127,'Corea del Sur'],ae:[23,53,'Emiratos'],ua:[48,31,'Ucrania'],ir:[32,53,'Irán']};
 
 const FALLBACK=[
   {title:'Explosiones reportadas en el centro de Kiev',desc:'Varias explosiones en el centro de la ciudad.',src:'Reuters',cat:'world',cc:'ua',t:'Hace 2 min',urg:true},
@@ -439,11 +379,11 @@ const FALLBACK=[
   {title:'Protestas masivas en São Paulo',desc:'Miles salen a las calles en todo Brasil.',src:'BBC World',cat:'world',cc:'br',t:'Hace 32 min'},
   {title:'Tensión militar elevada en Irán',desc:'Alertas de nivel máximo en la región.',src:'Al Jazeera',cat:'world',cc:'ir',t:'Hace 15 min'},
   {title:'Nuevo tratamiento contra el cáncer',desc:'Resultados históricos en ensayos clínicos.',src:'Lancet',cat:'health',cc:'gb',t:'Hace 28 min'},
-  {title:'SpaceX lanza misión tripulada',desc:'Misión a la estación espacial internacional.',src:'Space.com',cat:'science',cc:'us',t:'Hace 55 min'},
+  {title:'SpaceX lanza misión tripulada',desc:'Misión a la estación espacial.',src:'Space.com',cat:'science',cc:'us',t:'Hace 55 min'},
   {title:'Champions League: cuartos de final',desc:'Equipos clasificados esta semana.',src:'ESPN',cat:'sports',cc:'es',t:'Hace 1h'},
   {title:'Bitcoin supera récord histórico',desc:'La criptomoneda alcanza nuevo máximo.',src:'CoinDesk',cat:'business',cc:'us',t:'Hace 1h 35min'},
   {title:'Terremoto 5.8 en costa del Pacífico',desc:'Sin víctimas reportadas aún.',src:'USGS',cat:'science',cc:'pe',t:'Hace 1h 20min'},
-  {title:'Acuerdo comercial entre bloques económicos',desc:'Nuevo pacto entre Asia y Europa.',src:'FT',cat:'business',cc:'de',t:'Hace 41min'},
+  {title:'Acuerdo comercial entre bloques',desc:'Nuevo pacto entre Asia y Europa.',src:'FT',cat:'business',cc:'de',t:'Hace 41min'},
 ];
 const RSS=[
   {url:'https://feeds.bbci.co.uk/news/world/rss.xml',src:'BBC World',cat:'world',cc:'gb'},
@@ -454,242 +394,302 @@ const RSS=[
   {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',src:'NY Times',cat:'world',cc:'us'},
 ];
 
-// ══════════════════════════
-// STATE
-// ══════════════════════════
 let allNews=[...FALLBACK],activeFilter='all';
-let rotX=0,rotY=-15,prevX=0,prevY=0,isDragging=false;
-let proj,pathFn,dotsG,countryPaths,gratPath,globeSvg;
 
-// ══════════════════════════
-// GLOBE — D3 Orthographic
-// ══════════════════════════
-async function initGlobe(){
-  globeSvg=d3.select('#globe-svg');
-  const W=310,H=310,R=142;
+// ══════════════════════
+// THREE.JS GLOBE
+// ══════════════════════
+let scene,camera,renderer,globe,atmosphere,dots=[];
+let isDragging=false,prevX=0,prevY=0,targetRotY=-0.3,targetRotX=0.1,currentRotY=-0.3,currentRotX=0.1;
 
-  // Initial rotation: show Atlantic — America left, Africa right
-  proj=d3.geoOrthographic()
-    .scale(R).translate([W/2,H/2])
-    .clipAngle(90)
-    .rotate([rotY,-rotX]);
-  pathFn=d3.geoPath().projection(proj);
+function latLngToVec3(lat,lng,r=1.02){
+  const phi=(90-lat)*Math.PI/180;
+  const theta=(lng+180)*Math.PI/180;
+  return new THREE.Vector3(
+    -r*Math.sin(phi)*Math.cos(theta),
+    r*Math.cos(phi),
+    r*Math.sin(phi)*Math.sin(theta)
+  );
+}
 
-  const defs=globeSvg.append('defs');
+function initGlobe(){
+  const canvas=document.getElementById('globe-canvas');
+  const sec=document.getElementById('globe-section');
+  const W=sec.offsetWidth,H=sec.offsetHeight;
 
-  // Ocean gradient — dark satellite night look
-  const og=defs.append('radialGradient').attr('id','og').attr('cx','35%').attr('cy','35%');
-  og.append('stop').attr('offset','0%').attr('stop-color','#0e2040');
-  og.append('stop').attr('offset','55%').attr('stop-color','#06111e');
-  og.append('stop').attr('offset','100%').attr('stop-color','#020810');
+  // Scene
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(45,W/H,0.1,1000);
+  camera.position.z=2.5;
 
-  // Atmosphere glow gradient
-  const ag=defs.append('radialGradient').attr('id','atm').attr('cx','50%').attr('cy','50%');
-  ag.append('stop').attr('offset','75%').attr('stop-color','transparent');
-  ag.append('stop').attr('offset','100%').attr('stop-color','rgba(0,140,255,0.12)');
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setSize(W,H);
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setClearColor(0x000000,0);
 
-  // Dot glow filter
-  const df=defs.append('filter').attr('id','dg').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
-  df.append('feGaussianBlur').attr('stdDeviation','2.5').attr('result','b');
-  const dfm=df.append('feMerge');
-  dfm.append('feMergeNode').attr('in','b');
-  dfm.append('feMergeNode').attr('in','SourceGraphic');
+  // Earth sphere with night texture from NASA via proxy
+  const geo=new THREE.SphereGeometry(1,64,64);
 
-  // Ocean sphere
-  globeSvg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',R).attr('fill','url(#og)');
+  // Load earth night texture
+  const loader=new THREE.TextureLoader();
+  const earthTex=loader.load(
+    'https://raw.githubusercontent.com/turban/webgl-earth/master/images/2_no_clouds_4k.jpg',
+    ()=>{},()=>{},
+    ()=>{
+      // Fallback: draw procedural earth
+      drawProceduralGlobe();
+    }
+  );
+  const nightTex=loader.load('https://raw.githubusercontent.com/turban/webgl-earth/master/images/5_night_8k.jpg');
 
-  // Graticule
-  gratPath=globeSvg.append('path')
-    .datum(d3.geoGraticule().step([20,20])())
-    .attr('fill','none').attr('stroke','rgba(0,180,255,0.07)').attr('stroke-width',0.4)
-    .attr('d',pathFn);
+  const mat=new THREE.MeshPhongMaterial({
+    map:earthTex,
+    emissiveMap:nightTex,
+    emissive:new THREE.Color(0xffffff),
+    emissiveIntensity:0.8,
+    specular:new THREE.Color(0x333333),
+    shininess:15,
+  });
 
-  // Countries
-  try{
-    const res=await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
-    const world=await res.json();
-    const {feature}=await import('https://cdn.skypack.dev/topojson-client@3');
-    const countries=feature(world,world.objects.countries);
-    countryPaths=globeSvg.append('g').selectAll('path')
-      .data(countries.features).enter().append('path')
-      .attr('fill','#0d2545')
-      .attr('stroke','rgba(0,160,255,0.45)')
-      .attr('stroke-width',0.6)
-      .attr('d',pathFn);
-  }catch(e){console.warn('Countries load failed',e);}
+  globe=new THREE.Mesh(geo,mat);
+  scene.add(globe);
 
-  // Globe outline
-  globeSvg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',R)
-    .attr('fill','none').attr('stroke','rgba(0,180,255,0.3)').attr('stroke-width',1.8);
+  // Atmosphere glow
+  const atmGeo=new THREE.SphereGeometry(1.06,64,64);
+  const atmMat=new THREE.MeshPhongMaterial({
+    color:new THREE.Color(0x0044aa),
+    transparent:true,
+    opacity:0.08,
+    side:THREE.FrontSide,
+  });
+  atmosphere=new THREE.Mesh(atmGeo,atmMat);
+  scene.add(atmosphere);
 
-  // Atmosphere ring
-  globeSvg.append('circle').attr('cx',W/2).attr('cy',H/2).attr('r',R+6)
-    .attr('fill','url(#atm)');
+  // Atmosphere rim
+  const rimGeo=new THREE.SphereGeometry(1.08,64,64);
+  const rimMat=new THREE.ShaderMaterial({
+    uniforms:{},
+    vertexShader:`
+      varying vec3 vNormal;
+      void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}
+    `,
+    fragmentShader:`
+      varying vec3 vNormal;
+      void main(){
+        float intensity=pow(0.7-dot(vNormal,vec3(0,0,1.0)),2.0);
+        gl_FragColor=vec4(0.0,0.4,1.0,1.0)*intensity*0.5;
+      }
+    `,
+    blending:THREE.AdditiveBlending,
+    side:THREE.FrontSide,
+    transparent:true,
+  });
+  scene.add(new THREE.Mesh(rimGeo,rimMat));
 
-  dotsG=globeSvg.append('g').attr('id','dg-group');
-  updateGlobe();
+  // Lights
+  const ambient=new THREE.AmbientLight(0x111133,2);
+  scene.add(ambient);
+  const sun=new THREE.DirectionalLight(0xffffff,0.3);
+  sun.position.set(5,3,5);
+  scene.add(sun);
 
-  // ── Drag interaction ──
-  const el=document.getElementById('globe-svg');
-  const onStart=(x,y)=>{isDragging=true;prevX=x;prevY=y;};
-  const onMove=(x,y)=>{
+  // News dots on globe
+  addNewsDots();
+
+  // Drag
+  canvas.addEventListener('mousedown',e=>{isDragging=true;prevX=e.clientX;prevY=e.clientY;});
+  canvas.addEventListener('touchstart',e=>{isDragging=true;prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
+  window.addEventListener('mousemove',e=>{
     if(!isDragging)return;
-    rotY+=(x-prevX)*0.35;
-    rotX+=(y-prevY)*0.35;
-    rotX=Math.max(-60,Math.min(60,rotX));
-    prevX=x;prevY=y;
-    updateGlobe();
-  };
-  const onEnd=()=>isDragging=false;
-
-  el.addEventListener('mousedown',e=>{onStart(e.clientX,e.clientY);e.preventDefault();});
-  el.addEventListener('touchstart',e=>{onStart(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
-  window.addEventListener('mousemove',e=>{onMove(e.clientX,e.clientY);});
-  window.addEventListener('touchmove',e=>{onMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
-  window.addEventListener('mouseup',onEnd);
-  window.addEventListener('touchend',onEnd);
-}
-
-function updateGlobe(){
-  if(!proj)return;
-  proj.rotate([rotY,-rotX]);
-  pathFn.projection(proj);
-  if(gratPath)gratPath.attr('d',pathFn);
-  if(countryPaths)countryPaths.attr('d',pathFn);
-  renderDots();
-}
-
-function renderDots(){
-  if(!dotsG)return;
-  dotsG.selectAll('*').remove();
-  const W=310,H=310;
-  const center=proj.invert([W/2,H/2]);
-
-  // Fixed popup dots (Kiev, Teherán, São Paulo) — always show
-  FIXED_DOTS.forEach(fd=>{
-    const p=proj([fd.lng,fd.lat]);
-    if(!p)return;
-    if(d3.geoDistance([fd.lng,fd.lat],center)>Math.PI/2)return;
-    drawDot(fd.lng,fd.lat,fd.col,true,center);
+    targetRotY+=(e.clientX-prevX)*0.005;
+    targetRotX+=(e.clientY-prevY)*0.005;
+    targetRotX=Math.max(-1,Math.min(1,targetRotX));
+    prevX=e.clientX;prevY=e.clientY;
   });
+  window.addEventListener('touchmove',e=>{
+    if(!isDragging)return;
+    targetRotY+=(e.touches[0].clientX-prevX)*0.005;
+    targetRotX+=(e.touches[0].clientY-prevY)*0.005;
+    targetRotX=Math.max(-1,Math.min(1,targetRotX));
+    prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;
+  },{passive:true});
+  window.addEventListener('mouseup',()=>isDragging=false);
+  window.addEventListener('touchend',()=>isDragging=false);
 
-  // News dots
-  const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
-  filtered.slice(0,16).forEach((n,i)=>{
+  animate();
+}
+
+function drawProceduralGlobe(){
+  // Fallback canvas texture if network fails
+  const c=document.createElement('canvas');c.width=1024;c.height=512;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#020d1e';ctx.fillRect(0,0,1024,512);
+  // Simple continents representation
+  ctx.fillStyle='#0d2545';
+  // North America
+  ctx.fillRect(80,80,200,180);
+  // South America
+  ctx.fillRect(150,270,120,160);
+  // Europe
+  ctx.fillRect(430,80,100,100);
+  // Africa
+  ctx.fillRect(430,190,120,200);
+  // Asia
+  ctx.fillRect(540,60,280,200);
+  // Australia
+  ctx.fillRect(680,310,140,100);
+  // City lights
+  for(let i=0;i<800;i++){
+    const x=Math.random()*1024,y=Math.random()*512;
+    ctx.beginPath();ctx.arc(x,y,Math.random()*1.5,0,Math.PI*2);
+    const cols=['#ffcc44','#ff8800','#ffffff','#88aaff'];
+    ctx.fillStyle=cols[Math.floor(Math.random()*cols.length)];
+    ctx.globalAlpha=Math.random()*0.8+0.2;ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  const tex=new THREE.CanvasTexture(c);
+  globe.material.map=tex;
+  globe.material.emissiveMap=tex;
+  globe.material.needsUpdate=true;
+}
+
+function addNewsDots(){
+  dots.forEach(d=>{if(d.parent)d.parent.remove(d);});dots=[];
+  const news=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
+
+  // Fixed 3 popup dots
+  const fixed=[
+    {lat:48.5,lng:31,col:'#ff2d2d'},
+    {lat:35.7,lng:51.4,col:'#9b59ff'},
+    {lat:-23.5,lng:-46.6,col:'#00e87a'},
+  ];
+  fixed.forEach(f=>createDot(f.lat,f.lng,f.col,true));
+  news.slice(0,14).forEach(n=>{
     const g=GEO[n.cc]||GEO.us;
-    const lat=g[0]+(Math.random()-0.5)*2.5;
-    const lng=g[1]+(Math.random()-0.5)*2.5;
-    drawDot(lng,lat,CC[n.cat]||'#fff',false,center,i,n);
+    const lat=g[0]+(Math.random()-0.5)*3;
+    const lng=g[1]+(Math.random()-0.5)*3;
+    createDot(lat,lng,CC[n.cat]||'#fff',false);
   });
 }
 
-function drawDot(lng,lat,col,isFixed,center,idx,news){
-  const p=proj([lng,lat]);
-  if(!p)return;
-  if(d3.geoDistance([lng,lat],center)>Math.PI/2)return;
-  const dur=isFixed?2.8:2.2+(idx||0)*0.07%0.8;
-
-  // Outer ring pulse 1
-  dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',isFixed?4:3)
-    .attr('fill','none').attr('stroke',col).attr('stroke-width',isFixed?1:0.9).attr('opacity',0.5)
-    .append('animate').attr('attributeName','r').attr('from',isFixed?4:3).attr('to',isFixed?14:12)
-    .attr('dur',dur+'s').attr('repeatCount','indefinite');
-  dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',isFixed?4:3)
-    .attr('fill','none').attr('stroke',col).attr('stroke-width','0.5').attr('opacity',0.2)
-    .append('animate').attr('attributeName','opacity').attr('from',0.2).attr('to',0)
-    .attr('dur',dur+'s').attr('repeatCount','indefinite');
-
-  // Outer ring pulse 2 (delayed)
-  dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',isFixed?4:3)
-    .attr('fill','none').attr('stroke',col).attr('stroke-width','0.7').attr('opacity',0.3)
-    .append('animate').attr('attributeName','r').attr('from',isFixed?4:3).attr('to',isFixed?14:12)
-    .attr('dur',dur+'s').attr('begin',(dur/2)+'s').attr('repeatCount','indefinite');
+function createDot(lat,lng,color,isFixed){
+  const pos=latLngToVec3(lat,lng,1.02);
+  const col=new THREE.Color(color);
 
   // Core dot
-  const core=dotsG.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',isFixed?5:4)
-    .attr('fill',col).attr('stroke','rgba(255,255,255,0.9)').attr('stroke-width',0.9)
-    .attr('filter','url(#dg)').style('cursor','pointer');
+  const coreGeo=new THREE.SphereGeometry(isFixed?0.018:0.012,8,8);
+  const coreMat=new THREE.MeshBasicMaterial({color:col});
+  const core=new THREE.Mesh(coreGeo,coreMat);
+  core.position.copy(pos);
+  scene.add(core);
+  dots.push(core);
 
-  if(news){
-    core.on('click',()=>{
-      const i=allNews.indexOf(news);
-      if(i>=0)document.getElementById('news-'+i)?.scrollIntoView({behavior:'smooth',block:'nearest'});
-    });
-  }
+  // Glow ring (pulse effect via scale animation)
+  const ringGeo=new THREE.RingGeometry(isFixed?0.025:0.018,isFixed?0.032:0.024,16);
+  const ringMat=new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.6,side:THREE.DoubleSide});
+  const ring=new THREE.Mesh(ringGeo,ringMat);
+  ring.position.copy(pos);
+  ring.lookAt(0,0,0);
+  ring.userData={pulse:true,speed:isFixed?0.6:0.8,phase:Math.random()*Math.PI*2,col,isFixed};
+  scene.add(ring);
+  dots.push(ring);
+
+  // Outer ring
+  const outerGeo=new THREE.RingGeometry(isFixed?0.04:0.03,isFixed?0.046:0.035,16);
+  const outerMat=new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.25,side:THREE.DoubleSide});
+  const outer=new THREE.Mesh(outerGeo,outerMat);
+  outer.position.copy(pos);
+  outer.lookAt(0,0,0);
+  outer.userData={pulse:true,speed:isFixed?0.5:0.7,phase:Math.random()*Math.PI*2+1,col,isFixed,outer:true};
+  scene.add(outer);
+  dots.push(outer);
 }
 
-// ══════════════════════════
-// NEWS RENDERING
-// ══════════════════════════
+let t=0;
+function animate(){
+  requestAnimationFrame(animate);
+  t+=0.016;
+
+  // Smooth rotation
+  if(!isDragging){targetRotY+=0.001;}
+  currentRotY+=(targetRotY-currentRotY)*0.05;
+  currentRotX+=(targetRotX-currentRotX)*0.05;
+  if(globe){globe.rotation.y=currentRotY;globe.rotation.x=currentRotX;}
+  if(atmosphere){atmosphere.rotation.y=currentRotY;atmosphere.rotation.x=currentRotX;}
+
+  // Animate dots
+  dots.forEach(d=>{
+    if(!d.userData.pulse)return;
+    const {speed,phase,isFixed,outer}=d.userData;
+    const s=t*speed+phase;
+    const pulse=Math.sin(s)*0.5+0.5;
+    if(outer){
+      d.material.opacity=pulse*0.3;
+      d.scale.setScalar(1+pulse*(isFixed?0.5:0.4));
+    }else{
+      d.material.opacity=0.4+pulse*0.5;
+      d.scale.setScalar(1+pulse*(isFixed?0.3:0.2));
+    }
+    d.rotation.copy(globe.rotation);
+  });
+
+  renderer.render(scene,camera);
+}
+
+// ══════════════════════
+// NEWS
+// ══════════════════════
 function gn(cc){return GEO[cc]?GEO[cc][2]:'Mundial';}
 function ta(d){
-  try{
-    const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);
-    if(m<1)return'Ahora';if(m<60)return'Hace '+m+' min';
-    const h=Math.floor(m/60);return h<24?'Hace '+h+'h':'Hace '+Math.floor(h/24)+'d';
-  }catch(e){return'Reciente';}
+  try{const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);
+  if(m<1)return'Ahora';if(m<60)return'Hace '+m+' min';
+  const h=Math.floor(m/60);return h<24?'Hace '+h+'h':'Hace '+Math.floor(h/24)+'d';}
+  catch(e){return'Reciente';}
 }
 
-function makeNI(n,i,compact=false){
+function makeNI(n,i,compact){
   const col=CC[n.cat]||'#fff';
   const thumb=n.img
-    ?`<div class="ni-thumb-wrap" style="position:relative;flex-shrink:0"><img class="ni-img" src="${n.img}" onerror="this.style.display='none'" alt=""/></div>`
-    :`<div class="ni-box" style="background:${col}12;flex-shrink:0">${CI[n.cat]||'📰'}</div>`;
+    ?`<img class="ni-img" src="${n.img}" onerror="this.style.display='none'" alt=""/>`
+    :`<div class="ni-box" style="background:${col}12">${CI[n.cat]||'📰'}</div>`;
   return `${thumb}
   <div class="ni-body">
     <div class="ni-top">${n.urg?'<span class="ni-urg">URGENTE</span>':''}<span class="ni-src" style="color:${col}">${n.src}</span></div>
-    <div class="ni-title">${n.title.slice(0,compact?65:80)}${n.title.length>(compact?65:80)?'...':''}</div>
-    ${n.desc&&!compact?`<div class="ni-desc">${n.desc.slice(0,70)}</div>`:''}
+    <div class="ni-title">${n.title.slice(0,compact?60:75)}${n.title.length>(compact?60:75)?'...':''}</div>
+    ${n.desc&&!compact?`<div class="ni-desc">${n.desc.slice(0,65)}</div>`:''}
     <div style="font-size:9px;color:rgba(255,255,255,0.22);margin-top:1px">${n.t}</div>
   </div>
-  <div class="ni-r">
-    <div class="ni-country">${gn(n.cc)}</div>
-    <div class="ni-arr">›</div>
-  </div>`;
+  <div class="ni-r"><div class="ni-country">${gn(n.cc)}</div><div class="ni-arr">›</div></div>`;
 }
 
 function renderNews(){
-  const list=document.getElementById('news-list');
-  list.innerHTML='';
-  const mb=document.getElementById('mbody');
-  mb.innerHTML='';
-
+  const list=document.getElementById('news-list');list.innerHTML='';
+  const mb=document.getElementById('mbody');mb.innerHTML='';
   const filtered=activeFilter==='all'?allNews:allNews.filter(n=>n.cat===activeFilter);
-
-  // Show exactly 4 in the main list
   filtered.slice(0,4).forEach((n,i)=>{
-    const el=document.createElement('div');
-    el.className='ni';el.id='news-'+i;
-    el.innerHTML=makeNI(n,i);
+    const el=document.createElement('div');el.className='ni';el.id='news-'+i;
+    el.innerHTML=makeNI(n,i,false);
     el.onclick=()=>{document.querySelectorAll('#news-list .ni').forEach(x=>x.classList.remove('on'));el.classList.add('on');};
     list.appendChild(el);
   });
-
-  // All in modal
   filtered.forEach((n,i)=>{
     const el=document.createElement('div');el.className='ni';
     el.innerHTML=makeNI(n,i,true);
     el.onclick=()=>{closeModal();setTimeout(()=>document.getElementById('news-'+i)?.scrollIntoView({behavior:'smooth'}),300);};
     mb.appendChild(el);
   });
-
-  renderDots();
+  if(dots.length)addNewsDots();
 }
 
-// ══════════════════════════
-// RSS FETCH
-// ══════════════════════════
 async function fetchRSS(){
   try{
     const results=await Promise.allSettled(RSS.map(async f=>{
       const r=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(f.url));
       const d=await r.json();
       if(d.status==='ok'&&d.items)return d.items.slice(0,4).map(item=>({
-        title:item.title,
-        desc:(item.description||'').replace(/<[^>]*>/g,'').slice(0,80),
+        title:item.title,desc:(item.description||'').replace(/<[^>]*>/g,'').slice(0,80),
         src:f.src,cat:f.cat,cc:f.cc,img:item.thumbnail||null,t:ta(item.pubDate)
-      }));
-      return[];
+      }));return[];
     }));
     const fetched=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
     if(fetched.length>3)allNews=fetched;
@@ -698,15 +698,13 @@ async function fetchRSS(){
   renderNews();
 }
 
-// ══════════════════════════
-// CATEGORY FILTERS
-// ══════════════════════════
+// ══════════════════════
+// CATEGORIES
+// ══════════════════════
 document.querySelectorAll('.ci').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.ci').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter=btn.dataset.cat;
-    // Sync pills
+    btn.classList.add('active');activeFilter=btn.dataset.cat;
     document.querySelectorAll('.cp').forEach(p=>{p.classList.remove('active');if(p.dataset.cat===activeFilter)p.classList.add('active');});
     renderNews();
   });
@@ -714,60 +712,45 @@ document.querySelectorAll('.ci').forEach(btn=>{
 document.querySelectorAll('.cp').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.cp').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    activeFilter=btn.dataset.cat;
-    // Sync left cats
+    btn.classList.add('active');activeFilter=btn.dataset.cat;
     document.querySelectorAll('.ci').forEach(c=>{c.classList.remove('active');if(c.dataset.cat===activeFilter)c.classList.add('active');});
     renderNews();
   });
 });
 
-// ══════════════════════════
+// ══════════════════════
 // MARKETS
-// ══════════════════════════
+// ══════════════════════
 function initGraphs(){
   [['g-btc',true],['g-oil',false],['g-gold',true],['g-silver',true]].forEach(([id,up])=>{
     const el=document.getElementById(id);if(!el)return;
     const vals=Array.from({length:10},(_,i)=>0.2+Math.random()*0.8+(up?i/25:-i/25));
     const mx=Math.max(...vals),mn=Math.min(...vals);
-    vals.forEach(v=>{
-      const b=document.createElement('div');
-      b.className='mg '+(up?'mgu':'mgd');
-      b.style.height=((v-mn)/(mx-mn)*14+2)+'px';
-      el.appendChild(b);
-    });
+    vals.forEach(v=>{const b=document.createElement('div');b.className='mg '+(up?'mgu':'mgd');b.style.height=((v-mn)/(mx-mn)*12+2)+'px';el.appendChild(b);});
   });
 }
-
 function animateMarkets(){
-  const markets=[
+  const m=[
     {id:'m-btc',cid:'mc-btc',tid:'t-btc',base:63245,dec:0},
     {id:'m-oil',cid:'mc-oil',tid:'t-oil',base:82.45,dec:2},
     {id:'m-gold',cid:'mc-gold',tid:'t-gold',base:2338,dec:0},
     {id:'m-silver',cid:'mc-silver',tid:'t-silver',base:27.34,dec:2},
   ];
   setInterval(()=>{
-    markets.forEach(mk=>{
+    m.forEach(mk=>{
       const chg=(Math.random()-0.47)*0.3;mk.base*=(1+chg/100);
       const v=mk.dec?mk.base.toFixed(mk.dec):Math.round(mk.base).toLocaleString();
-      const el=document.getElementById(mk.id);
-      const cel=document.getElementById(mk.cid);
-      const tel=mk.tid?document.getElementById(mk.tid):null;
-      if(el)el.textContent=v;
-      if(tel)tel.textContent='$'+v;
+      const el=document.getElementById(mk.id),cel=document.getElementById(mk.cid),tel=mk.tid?document.getElementById(mk.tid):null;
+      if(el)el.textContent=v;if(tel)tel.textContent='$'+v;
       if(cel){cel.textContent=(chg>=0?'+':'')+chg.toFixed(2)+'%';cel.className='mc-chg '+(chg>=0?'up':'down');}
     });
   },3000);
 }
+function animateCount(){let c=14021;setInterval(()=>{c+=Math.floor(Math.random()*8-2);document.getElementById('act-num').textContent=c.toLocaleString();},2500);}
 
-function animateCount(){
-  let c=14021;
-  setInterval(()=>{c+=Math.floor(Math.random()*8-2);document.getElementById('act-num').textContent=c.toLocaleString();},2500);
-}
-
-// ══════════════════════════
+// ══════════════════════
 // UI
-// ══════════════════════════
+// ══════════════════════
 function openMenu(){document.getElementById('overlay').classList.add('on');document.getElementById('smenu').classList.add('on');}
 function closeMenu(){document.getElementById('overlay').classList.remove('on');document.getElementById('smenu').classList.remove('on');}
 function openModal(){document.getElementById('mwrap').classList.add('on');}
@@ -777,7 +760,7 @@ function closePage(id){document.getElementById(id).classList.remove('on');}
 function showHome(){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));document.querySelector('.bni').classList.add('active');}
 function shareApp(){
   const url='https://orvex-chi.vercel.app/';
-  if(navigator.share)navigator.share({title:'ORVEX',text:'El mundo en tiempo real',url});
+  if(navigator.share)navigator.share({title:'ORVEX',url});
   else navigator.clipboard?.writeText(url).then(()=>showToast('✅ Link copiado'));
   closeMenu();
 }
@@ -786,21 +769,18 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 document.getElementById('menu-btn').onclick=openMenu;
 document.getElementById('overlay').onclick=e=>{if(e.target===document.getElementById('overlay'))closeMenu();};
 document.getElementById('mwrap').onclick=e=>{if(e.target===document.getElementById('mwrap'))closeModal();};
-document.querySelectorAll('.bni').forEach(item=>{
-  item.addEventListener('click',()=>{document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));item.classList.add('active');});
-});
+document.querySelectorAll('.bni').forEach(item=>{item.addEventListener('click',()=>{document.querySelectorAll('.bni').forEach(n=>n.classList.remove('active'));item.classList.add('active');});});
 
-// ══════════════════════════
-// INIT
-// ══════════════════════════
-window.addEventListener('load',async()=>{
-  animateCount();
-  initGraphs();
-  animateMarkets();
-  renderNews();
-  await initGlobe();
-  fetchRSS();
-  setInterval(fetchRSS,300000);
+window.addEventListener('load',()=>{
+  animateCount();initGraphs();animateMarkets();renderNews();
+  initGlobe();fetchRSS();setInterval(fetchRSS,300000);
+});
+window.addEventListener('resize',()=>{
+  if(!renderer)return;
+  const sec=document.getElementById('globe-section');
+  renderer.setSize(sec.offsetWidth,sec.offsetHeight);
+  camera.aspect=sec.offsetWidth/sec.offsetHeight;
+  camera.updateProjectionMatrix();
 });
 </script>
 </body>
